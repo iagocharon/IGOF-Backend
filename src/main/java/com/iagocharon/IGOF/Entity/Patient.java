@@ -1,16 +1,14 @@
 package com.iagocharon.IGOF.Entity;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "patients")
@@ -33,6 +31,10 @@ public class Patient extends User {
   @OneToMany(mappedBy = "patient")
   @JsonIgnoreProperties("patient")
   private List<Appointment> appointments;
+
+  @OneToMany(mappedBy = "patient")
+  @JsonIgnoreProperties("patient")
+  private List<UltrasoundAppointment> ultrasoundAppointments;
 
   @OneToOne(mappedBy = "patient")
   @JoinColumn(name = "medical_record_id")
@@ -121,5 +123,27 @@ public class Patient extends User {
 
   public void setCitizenship(String citizenship) {
     this.citizenship = citizenship;
+  }
+
+  public List<UltrasoundAppointment> getUltrasoundAppointments() {
+    return this.ultrasoundAppointments;
+  }
+
+  public void setUltrasoundAppointments(
+    List<UltrasoundAppointment> ultrasoundAppointments
+  ) {
+    this.ultrasoundAppointments = ultrasoundAppointments;
+  }
+
+  public void addUltrasoundAppointment(
+    UltrasoundAppointment ultrasoundAppointment
+  ) {
+    this.ultrasoundAppointments.add(ultrasoundAppointment);
+  }
+
+  public void removeUltrasoundAppointment(
+    UltrasoundAppointment ultrasoundAppointment
+  ) {
+    this.ultrasoundAppointments.remove(ultrasoundAppointment);
   }
 }

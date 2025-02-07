@@ -1,10 +1,6 @@
 package com.iagocharon.IGOF.Entity;
 
-import java.time.ZonedDateTime;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,6 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "appointments")
@@ -58,6 +56,11 @@ public class Appointment {
   @JoinColumn(name = "insurance_id")
   @JsonIgnoreProperties("appointments")
   private Insurance insurance;
+
+  @ManyToOne
+  @JoinColumn(name = "ultrasound_doctor_id")
+  @JsonIgnoreProperties("appointments")
+  private Doctor ultrasoundDoctor;
 
   public Appointment() {
     this.status = AppointmentStatus.INCOMPLETE;
@@ -189,5 +192,13 @@ public class Appointment {
 
   public String getInsuranceName() {
     return insurance.getName();
+  }
+
+  public Doctor getUltrasoundDoctor() {
+    return ultrasoundDoctor;
+  }
+
+  public UUID getUltrasoundDoctorId() {
+    return ultrasoundDoctor.getId();
   }
 }

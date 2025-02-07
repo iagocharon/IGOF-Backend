@@ -1,11 +1,6 @@
 package com.iagocharon.IGOF.Entity;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,6 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "work_schedules")
@@ -34,6 +32,11 @@ public class WorkSchedule {
     { "workSchedules", "insurances", "appointments", "specialties" }
   )
   private Doctor doctor;
+
+  @ManyToOne
+  @JoinColumn(name = "ultrasound_doctor_id")
+  @JsonIgnoreProperties({ "workSchedules", "insurances" })
+  private UltrasoundDoctor ultrasoundDoctor;
 
   public WorkSchedule() {}
 
@@ -75,5 +78,13 @@ public class WorkSchedule {
 
   public void setDoctor(Doctor doctor) {
     this.doctor = doctor;
+  }
+
+  public UltrasoundDoctor getUltrasoundDoctor() {
+    return this.ultrasoundDoctor;
+  }
+
+  public void setUltrasoundDoctor(UltrasoundDoctor ultrasoundDoctor) {
+    this.ultrasoundDoctor = ultrasoundDoctor;
   }
 }

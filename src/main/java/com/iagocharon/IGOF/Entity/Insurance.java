@@ -1,11 +1,6 @@
 package com.iagocharon.IGOF.Entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,6 +12,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "insurances")
@@ -39,6 +37,22 @@ public class Insurance {
   )
   private List<Doctor> doctors;
 
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+    name = "insurance_ultrasound_doctors",
+    joinColumns = @JoinColumn(name = "insurance_id"),
+    inverseJoinColumns = @JoinColumn(name = "ultrasound_doctor_id")
+  )
+  @JsonIgnoreProperties(
+    {
+      "insurances",
+      "ultrasoundStudies",
+      "ultrasoundAppointments",
+      "workSchedules",
+    }
+  )
+  private List<UltrasoundDoctor> ultrasoundDoctors;
+
   private int dailyLimit;
 
   @OneToMany(
@@ -57,6 +71,24 @@ public class Insurance {
     }
   )
   private List<Appointment> appointments = new ArrayList<>();
+
+  @OneToMany(
+    mappedBy = "insurance",
+    fetch = FetchType.LAZY,
+    cascade = CascadeType.ALL
+  )
+  @JsonIgnoreProperties(
+    {
+      "insurance",
+      "paymentMethod",
+      "surgeryPaymentMethod",
+      "doctor",
+      "patient",
+      "insurance",
+    }
+  )
+  private List<UltrasoundAppointment> ultrasoundAppointments =
+    new ArrayList<>();
 
   public Insurance() {
     doctors = new ArrayList<>();
@@ -119,5 +151,45 @@ public class Insurance {
   public void removeAppointment(Appointment appointment) {
     appointments.remove(appointment);
     appointment.setInsurance(null);
+  }
+
+  public List<UltrasoundDoctor> getUltrasoundDoctors() {
+    return this.ultrasoundDoctors;
+  }
+
+  public void setUltrasoundDoctors(List<UltrasoundDoctor> ultrasoundDoctors) {
+    this.ultrasoundDoctors = ultrasoundDoctors;
+  }
+
+  public void addUltrasoundDoctor(UltrasoundDoctor ultrasoundDoctor) {
+    this.ultrasoundDoctors.add(ultrasoundDoctor);
+  }
+
+  public void removeUltrasoundDoctor(UltrasoundDoctor ultrasoundDoctor) {
+    this.ultrasoundDoctors.remove(ultrasoundDoctor);
+  }
+
+  public List<UltrasoundAppointment> getUltrasoundAppointments() {
+    return this.ultrasoundAppointments;
+  }
+
+  public void setUltrasoundAppointments(
+    List<UltrasoundAppointment> ultrasoundAppointments
+  ) {
+    this.ultrasoundAppointments = ultrasoundAppointments;
+  }
+
+  public void addUltrasoundAppointment(
+    UltrasoundAppointment ultrasoundAppointment
+  ) {
+    this.ultrasoundAppointments.add(ultrasoundAppointment);
+    ultrasoundAppointment.setInsurance(this);
+  }
+
+  public void removeUltrasoundAppointment(
+    UltrasoundAppointment ultrasoundAppointment
+  ) {
+    this.ultrasoundAppointments.remove(ultrasoundAppointment);
+    ultrasoundAppointment.setInsurance(null);
   }
 }

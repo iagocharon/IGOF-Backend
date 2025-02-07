@@ -1,8 +1,5 @@
 package com.iagocharon.IGOF.Entity;
 
-import java.time.ZonedDateTime;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "evolutions")
@@ -23,7 +22,7 @@ public class Evolution {
 
   @ManyToOne
   @JoinColumn(name = "medical_record_id")
-  @JsonIgnoreProperties({"evolutions", "patient"})
+  @JsonIgnoreProperties({ "evolutions", "patient" })
   private MedicalRecord medicalRecord;
 
   @Column(columnDefinition = "TEXT")
@@ -35,8 +34,9 @@ public class Evolution {
 
   private ZonedDateTime date;
 
-  public Evolution() {}
-
+  public Evolution() {
+    date = ZonedDateTime.now();
+  }
 
   public UUID getId() {
     return this.id;
@@ -78,7 +78,6 @@ public class Evolution {
     this.date = date;
   }
 
-
   public String getDoctorName() {
     return this.doctorName;
   }
@@ -86,7 +85,4 @@ public class Evolution {
   public void setDoctorName(String doctorName) {
     this.doctorName = doctorName;
   }
-
-
-
 }

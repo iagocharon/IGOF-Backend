@@ -1,11 +1,6 @@
 package com.iagocharon.IGOF.Entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,9 +8,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
-@Table(name = "payment_methods", uniqueConstraints = {@UniqueConstraint(columnNames = "name")})
+@Table(
+  name = "payment_methods",
+  uniqueConstraints = { @UniqueConstraint(columnNames = "name") }
+)
 public class PaymentMethod {
 
   @Id
@@ -25,11 +26,21 @@ public class PaymentMethod {
   private String name;
 
   @OneToMany(mappedBy = "paymentMethod")
-  @JsonIgnoreProperties({"paymentMethod", "surgeryPaymentMethod", "doctor", "patient"})
+  @JsonIgnoreProperties(
+    { "paymentMethod", "surgeryPaymentMethod", "doctor", "patient" }
+  )
   List<Appointment> appointments;
 
   @OneToMany(mappedBy = "paymentMethod")
-  @JsonIgnoreProperties({"paymentMethod", "surgeryPaymentMethod", "doctor", "patient"})
+  @JsonIgnoreProperties(
+    { "paymentMethod", "surgeryPaymentMethod", "doctor", "patient" }
+  )
+  List<UltrasoundAppointment> ultrasoundAppointments;
+
+  @OneToMany(mappedBy = "paymentMethod")
+  @JsonIgnoreProperties(
+    { "paymentMethod", "surgeryPaymentMethod", "doctor", "patient" }
+  )
   List<Appointment> surgeryAppointments;
 
   public PaymentMethod() {
@@ -85,4 +96,25 @@ public class PaymentMethod {
     this.surgeryAppointments.remove(appointment);
   }
 
+  public List<UltrasoundAppointment> getUltrasoundAppointments() {
+    return this.ultrasoundAppointments;
+  }
+
+  public void setUltrasoundAppointments(
+    List<UltrasoundAppointment> ultrasoundAppointments
+  ) {
+    this.ultrasoundAppointments = ultrasoundAppointments;
+  }
+
+  public void addUltrasoundAppointment(
+    UltrasoundAppointment ultrasoundAppointment
+  ) {
+    this.ultrasoundAppointments.add(ultrasoundAppointment);
+  }
+
+  public void removeUltrasoundAppointment(
+    UltrasoundAppointment ultrasoundAppointment
+  ) {
+    this.ultrasoundAppointments.remove(ultrasoundAppointment);
+  }
 }

@@ -1,19 +1,5 @@
 package com.iagocharon.IGOF;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-
 import com.iagocharon.IGOF.Entity.Doctor;
 import com.iagocharon.IGOF.Entity.Insurance;
 import com.iagocharon.IGOF.Entity.MedicalRecord;
@@ -21,6 +7,8 @@ import com.iagocharon.IGOF.Entity.Patient;
 import com.iagocharon.IGOF.Entity.PaymentMethod;
 import com.iagocharon.IGOF.Entity.Role;
 import com.iagocharon.IGOF.Entity.Specialty;
+import com.iagocharon.IGOF.Entity.UltrasoundDoctor;
+import com.iagocharon.IGOF.Entity.UltrasoundStudy;
 import com.iagocharon.IGOF.Entity.User;
 import com.iagocharon.IGOF.Entity.WorkSchedule;
 import com.iagocharon.IGOF.Repository.PaymentMethodRepository;
@@ -31,7 +19,21 @@ import com.iagocharon.IGOF.Service.InsuranceService;
 import com.iagocharon.IGOF.Service.MedicalRecordService;
 import com.iagocharon.IGOF.Service.PatientService;
 import com.iagocharon.IGOF.Service.SpecialtyService;
+import com.iagocharon.IGOF.Service.UltrasoundDoctorService;
+import com.iagocharon.IGOF.Service.UltrasoundStudyService;
 import com.iagocharon.IGOF.Service.WorkScheduleService;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 @Component
 public class Utils implements CommandLineRunner {
@@ -66,11 +68,18 @@ public class Utils implements CommandLineRunner {
   @Autowired
   PaymentMethodRepository paymentMethodRepository;
 
+  @Autowired
+  UltrasoundDoctorService ultrasoundDoctorService;
+
+  @Autowired
+  UltrasoundStudyService ultrasoundStudyService;
+
   @Override
   public void run(String... args) {
     // createInsurancesAndPatients();
     // createPaymentMethods();
     // createAdmin("admin", "admin", "admin@admin.com", "admin", "admin");
+    // createUltrasoundDoctors();
   }
 
   public void createInsurancesAndPatients() {
@@ -494,6 +503,65 @@ public class Utils implements CommandLineRunner {
     }
   }
 
+  public void createUltrasoundDoctors() {
+    List<UltrasoundStudy> ultrasoundStudies = Arrays.asList(
+      ultrasoundStudyService.save(new UltrasoundStudy("Ecografía Abdominal")),
+      ultrasoundStudyService.save(new UltrasoundStudy("Ecografía Obstétrica")),
+      ultrasoundStudyService.save(new UltrasoundStudy("Ecografía Mamaria")),
+      ultrasoundStudyService.save(new UltrasoundStudy("Ecografía Doppler")),
+      ultrasoundStudyService.save(
+        new UltrasoundStudy("Ecografía Musculoesquelética")
+      ),
+      ultrasoundStudyService.save(new UltrasoundStudy("Ecografía Renal")),
+      ultrasoundStudyService.save(new UltrasoundStudy("Ecografía Tiroidea")),
+      ultrasoundStudyService.save(new UltrasoundStudy("Ecografía Pélvica")),
+      ultrasoundStudyService.save(new UltrasoundStudy("Ecografía Testicular")),
+      ultrasoundStudyService.save(new UltrasoundStudy("Ecografía Hepática"))
+    );
+
+    createUltrasoundDoctor(
+      "marianaperez",
+      "password123",
+      "marianaperez@gmail.com",
+      "Mariana",
+      "Pérez",
+      ultrasoundStudies
+    );
+
+    createUltrasoundDoctor(
+      "fernandolopez",
+      "password123",
+      "fernandolopez@gmail.com",
+      "Fernando",
+      "López",
+      ultrasoundStudies
+    );
+    createUltrasoundDoctor(
+      "anagomez",
+      "password123",
+      "anagomez@gmail.com",
+      "Ana",
+      "Gómez",
+      ultrasoundStudies
+    );
+    createUltrasoundDoctor(
+      "jorgefernandez",
+      "password123",
+      "jorgefernandez@gmail.com",
+      "Jorge",
+      "Fernández",
+      ultrasoundStudies
+    );
+    createUltrasoundDoctor(
+      "martasanchez",
+      "password123",
+      "martasanchez@gmail.com",
+      "Marta",
+      "Sánchez",
+      ultrasoundStudies
+    );
+  }
+
   private void createPatient(
     String username,
     String email,
@@ -564,6 +632,50 @@ public class Utils implements CommandLineRunner {
     doctorService.save(user);
   }
 
+  private void createUltrasoundDoctor(
+    String username,
+    String password,
+    String email,
+    String firstName,
+    String lastName,
+    List<UltrasoundStudy> ultrasoundStudies
+  ) {
+    List<Insurance> insurances = insuranceService.getAll();
+
+    UltrasoundDoctor user = new UltrasoundDoctor();
+    user.setUsername(username);
+    user.setPassword(passwordEncoder.encode(password));
+    user.setEmail(email);
+    user.setName(firstName);
+    user.setLastname(lastName);
+    user.setUltrasoundStudies(ultrasoundStudies);
+    user.setAppointmentDuration((int) (Math.random() * (45 - 25 + 1) + 25));
+    user.setRole(Role.ULTRASOUND_DOCTOR);
+
+    user = ultrasoundDoctorService.save(user);
+
+    for (Insurance insurance : insurances) {
+      user.addInsurance(insurance);
+      insurance.addUltrasoundDoctor(user);
+      insuranceService.save(insurance);
+      user = ultrasoundDoctorService.save(user);
+    }
+
+    for (UltrasoundStudy ultrasoundStudy : ultrasoundStudies) {
+      user.addUltrasoundStudy(ultrasoundStudy);
+      ultrasoundStudy.addUltrasoundDoctor(user);
+      ultrasoundStudyService.save(ultrasoundStudy);
+      user = ultrasoundDoctorService.save(user);
+    }
+
+    List<WorkSchedule> workSchedules = createWorkSchedulesForUltraSoundDoctor(
+      user
+    );
+
+    user.setWorkSchedules(workSchedules);
+    ultrasoundDoctorService.save(user);
+  }
+
   private void createAdmin(
     String username,
     String password,
@@ -611,6 +723,31 @@ public class Utils implements CommandLineRunner {
         schedule.setStart(LocalTime.of(9, 30));
         schedule.setEnd(LocalTime.of(18, 30));
         schedule.setDoctor(doctor);
+        workSchedules.add(workScheduleService.save(schedule));
+      }
+    }
+    return workSchedules;
+  }
+
+  private List<WorkSchedule> createWorkSchedulesForUltraSoundDoctor(
+    UltrasoundDoctor ultrasoundDoctor
+  ) {
+    List<WorkSchedule> workSchedules = new ArrayList<>();
+    LocalDate today = LocalDate.now().minusDays(1);
+    LocalDate threeMonthsLater = today.plusMonths(3);
+
+    for (
+      LocalDate date = today;
+      !date.isAfter(threeMonthsLater);
+      date = date.plusDays(1)
+    ) {
+      DayOfWeek dayOfWeek = date.getDayOfWeek();
+      if (dayOfWeek != DayOfWeek.SUNDAY) {
+        WorkSchedule schedule = new WorkSchedule();
+        schedule.setDate(date);
+        schedule.setStart(LocalTime.of(9, 30));
+        schedule.setEnd(LocalTime.of(18, 30));
+        schedule.setUltrasoundDoctor(ultrasoundDoctor);
         workSchedules.add(workScheduleService.save(schedule));
       }
     }

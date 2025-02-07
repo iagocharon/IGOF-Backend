@@ -1,21 +1,18 @@
 package com.iagocharon.IGOF.Service;
 
+import com.iagocharon.IGOF.Entity.Doctor;
+import com.iagocharon.IGOF.Entity.WorkSchedule;
+import com.iagocharon.IGOF.Repository.DoctorRepository;
+import com.iagocharon.IGOF.Repository.WorkScheduleRepository;
+import jakarta.transaction.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.iagocharon.IGOF.Entity.Doctor;
-import com.iagocharon.IGOF.Entity.WorkSchedule;
-import com.iagocharon.IGOF.Repository.DoctorRepository;
-import com.iagocharon.IGOF.Repository.WorkScheduleRepository;
-
-import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
@@ -51,13 +48,36 @@ public class WorkScheduleService {
     workScheduleRepository.deleteById(id);
   }
 
-  public List<WorkSchedule> findBetweenDates(UUID doctorId, LocalDate startDate,
-      LocalDate endDate) {
-    return workScheduleRepository.findByDoctorIdAndDateBetween(doctorId, startDate, endDate);
+  public List<WorkSchedule> findDoctorBetweenDates(
+    UUID doctorId,
+    LocalDate startDate,
+    LocalDate endDate
+  ) {
+    return workScheduleRepository.findByDoctorIdAndDateBetween(
+      doctorId,
+      startDate,
+      endDate
+    );
   }
 
-  public List<WorkSchedule> createSchedulesInInterval(LocalDate startDate, LocalDate endDate,
-      DayOfWeek dayOfWeek, WorkSchedule workScheduleTemplate) {
+  public List<WorkSchedule> findUltrasoundDoctorBetweenDates(
+    UUID ultrasoundDoctorId,
+    LocalDate startDate,
+    LocalDate endDate
+  ) {
+    return workScheduleRepository.findByUltrasoundDoctorIdAndDateBetween(
+      ultrasoundDoctorId,
+      startDate,
+      endDate
+    );
+  }
+
+  public List<WorkSchedule> createSchedulesInInterval(
+    LocalDate startDate,
+    LocalDate endDate,
+    DayOfWeek dayOfWeek,
+    WorkSchedule workScheduleTemplate
+  ) {
     List<WorkSchedule> schedules = new ArrayList<>();
     LocalDate date = startDate;
     while (!date.isAfter(endDate)) {
@@ -73,6 +93,4 @@ public class WorkScheduleService {
     }
     return schedules;
   }
-
-
 }

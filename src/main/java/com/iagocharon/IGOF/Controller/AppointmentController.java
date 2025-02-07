@@ -1,22 +1,5 @@
 package com.iagocharon.IGOF.Controller;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.iagocharon.IGOF.Dto.AppointmentDto;
 import com.iagocharon.IGOF.Dto.ConfirmAppointmentDto;
 import com.iagocharon.IGOF.Dto.Message;
@@ -32,6 +15,21 @@ import com.iagocharon.IGOF.Service.DoctorService;
 import com.iagocharon.IGOF.Service.InsuranceService;
 import com.iagocharon.IGOF.Service.PatientService;
 import com.iagocharon.IGOF.Service.PaymentMethodService;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/appointment")
@@ -179,7 +177,7 @@ public class AppointmentController {
 
     return new ResponseEntity<>(
       new Message("Appointment created successfully."),
-      HttpStatus.CREATED
+      HttpStatus.OK
     );
   }
 
@@ -293,7 +291,7 @@ public class AppointmentController {
     appointment.setStatus(AppointmentStatus.CANCELLED);
     appointmentService.save(appointment);
     return new ResponseEntity<>(
-      new Message("Appointment cancelled status toggled."),
+      new Message("Appointment cancelled successfully."),
       HttpStatus.OK
     );
   }
