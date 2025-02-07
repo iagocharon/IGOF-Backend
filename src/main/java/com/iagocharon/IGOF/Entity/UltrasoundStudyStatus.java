@@ -1,7 +1,6 @@
 package com.iagocharon.IGOF.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.iagocharon.IGOF.Dto.UltrasoundStudyReport;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 
@@ -33,11 +31,6 @@ public class UltrasoundStudyStatus {
   private StudyStatus status;
 
   private String reason;
-
-  @OneToOne
-  @JoinColumn(name = "ultrasound_study_report_id", referencedColumnName = "id")
-  @JsonIgnoreProperties("ultrasoundStudyStatus")
-  private UltrasoundStudyReport ultrasoundStudyReport;
 
   public UltrasoundStudyStatus() {}
 
@@ -81,15 +74,5 @@ public class UltrasoundStudyStatus {
 
   public void setReason(String reason) {
     this.reason = reason;
-  }
-
-  public UltrasoundStudyReport getUltrasoundStudyReport() {
-    return this.ultrasoundStudyReport;
-  }
-
-  public void setUltrasoundStudyReport(
-    UltrasoundStudyReport ultrasoundStudyReport
-  ) {
-    this.ultrasoundStudyReport = ultrasoundStudyReport;
   }
 }

@@ -57,11 +57,6 @@ public class Appointment {
   @JsonIgnoreProperties("appointments")
   private Insurance insurance;
 
-  @ManyToOne
-  @JoinColumn(name = "ultrasound_doctor_id")
-  @JsonIgnoreProperties("appointments")
-  private Doctor ultrasoundDoctor;
-
   public Appointment() {
     this.status = AppointmentStatus.INCOMPLETE;
   }
@@ -192,13 +187,5 @@ public class Appointment {
 
   public String getInsuranceName() {
     return insurance.getName();
-  }
-
-  public Doctor getUltrasoundDoctor() {
-    return ultrasoundDoctor;
-  }
-
-  public UUID getUltrasoundDoctorId() {
-    return ultrasoundDoctor.getId();
   }
 }

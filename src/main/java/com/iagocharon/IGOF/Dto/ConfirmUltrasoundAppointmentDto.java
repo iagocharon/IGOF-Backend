@@ -44,4 +44,22 @@ public class ConfirmUltrasoundAppointmentDto {
   ) {
     this.ultrasoundStudyStatus = ultrasoundStudyStatus;
   }
+
+  @Override
+  public String toString() {
+    return (
+      "ConfirmUltrasoundAppointmentDto{" +
+      "status='" +
+      status +
+      '\'' +
+      ", plus=" +
+      plus +
+      ", paymentMethodId='" +
+      paymentMethodId +
+      '\'' +
+      ", ultrasoundStudyStatus=" +
+      ultrasoundStudyStatus +
+      '}'
+    );
+  }
 }

@@ -1,8 +1,6 @@
-package com.iagocharon.IGOF.Dto;
+package com.iagocharon.IGOF.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.iagocharon.IGOF.Entity.Patient;
-import com.iagocharon.IGOF.Entity.UltrasoundStudyStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -23,8 +20,15 @@ public class UltrasoundStudyReport {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
+  @ManyToOne
+  @JoinColumn(name = "medical_record_id")
+  @JsonIgnoreProperties({ "evolutions", "patient", "ultrasoundStudyReports" })
+  private MedicalRecord medicalRecord;
+
+  private String title;
+
   @Column(columnDefinition = "TEXT")
-  private String report;
+  private String description;
 
   private UUID doctorId;
 
@@ -32,18 +36,16 @@ public class UltrasoundStudyReport {
 
   private ZonedDateTime date;
 
-  @ManyToOne
-  @JoinColumn(name = "ultrasound_study_id")
-  @JsonIgnoreProperties({ "ultrasoundStudyReport", "ultrasoundDoctor" })
-  private Patient patient;
-
-  @OneToOne
-  @JoinColumn(name = "ultrasound_study_status_id", referencedColumnName = "id")
-  @JsonIgnoreProperties("ultrasoundStudyReport")
-  private UltrasoundStudyStatus ultrasoundStudyStatus;
-
   public UltrasoundStudyReport() {
     date = ZonedDateTime.now();
+  }
+
+  public String getTitle() {
+    return this.title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public UUID getId() {
@@ -52,14 +54,6 @@ public class UltrasoundStudyReport {
 
   public void setId(UUID id) {
     this.id = id;
-  }
-
-  public String getReport() {
-    return this.report;
-  }
-
-  public void setReport(String report) {
-    this.report = report;
   }
 
   public UUID getDoctorId() {
@@ -86,21 +80,27 @@ public class UltrasoundStudyReport {
     this.date = date;
   }
 
-  public Patient getPatient() {
-    return this.patient;
+  public MedicalRecord getMedicalRecord() {
+    return this.medicalRecord;
   }
 
-  public void setPatient(Patient patient) {
-    this.patient = patient;
+  public void setMedicalRecord(MedicalRecord medicalRecord) {
+    this.medicalRecord = medicalRecord;
   }
 
-  public UltrasoundStudyStatus getUltrasoundStudyStatus() {
-    return this.ultrasoundStudyStatus;
+  public void addMedicalRecord(MedicalRecord medicalRecord) {
+    this.medicalRecord = medicalRecord;
   }
 
-  public void setUltrasoundStudyStatus(
-    UltrasoundStudyStatus ultrasoundStudyStatus
-  ) {
-    this.ultrasoundStudyStatus = ultrasoundStudyStatus;
+  public void removeMedicalRecord(MedicalRecord medicalRecord) {
+    this.medicalRecord = null;
+  }
+
+  public String getDescription() {
+    return this.description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 }

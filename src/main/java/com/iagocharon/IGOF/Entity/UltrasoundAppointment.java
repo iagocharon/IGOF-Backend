@@ -65,6 +65,7 @@ public class UltrasoundAppointment {
   List<UltrasoundStudyStatus> ultrasoundStudyStatuses;
 
   public UltrasoundAppointment() {
+    this.status = AppointmentStatus.INCOMPLETE;
     this.ultrasoundStudyStatuses = new ArrayList<>();
   }
 
@@ -172,5 +173,29 @@ public class UltrasoundAppointment {
 
   public String getPaymentMethodName() {
     return paymentMethod != null ? paymentMethod.getName() : null;
+  }
+
+  public UUID getPatientId() {
+    return patient.getId();
+  }
+
+  public String getPatientName() {
+    return patient.getName();
+  }
+
+  public String getPatientLastname() {
+    return patient.getLastname();
+  }
+
+  public UUID getInsuranceId() {
+    return insurance.getId();
+  }
+
+  public UUID getUltrasoundDoctorId() {
+    return ultrasoundDoctor.getId();
+  }
+
+  public String getAppointmentStatusString() {
+    return status.toString();
   }
 }

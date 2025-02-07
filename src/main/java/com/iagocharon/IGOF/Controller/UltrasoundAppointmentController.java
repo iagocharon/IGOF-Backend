@@ -9,6 +9,7 @@ import com.iagocharon.IGOF.Entity.AppointmentStatus;
 import com.iagocharon.IGOF.Entity.Insurance;
 import com.iagocharon.IGOF.Entity.Patient;
 import com.iagocharon.IGOF.Entity.PaymentMethod;
+import com.iagocharon.IGOF.Entity.StudyStatus;
 import com.iagocharon.IGOF.Entity.UltrasoundAppointment;
 import com.iagocharon.IGOF.Entity.UltrasoundDoctor;
 import com.iagocharon.IGOF.Entity.UltrasoundStudyStatus;
@@ -192,6 +193,7 @@ public class UltrasoundAppointmentController {
     @RequestBody ConfirmUltrasoundAppointmentDto confirmUltrasoundAppointmentDto,
     @RequestParam String id
   ) {
+    System.out.println(confirmUltrasoundAppointmentDto.toString());
     if (!ultrasoundAppointmentService.existsById(UUID.fromString(id))) {
       return new ResponseEntity<>(
         new Message("No appointment found."),
@@ -247,10 +249,14 @@ public class UltrasoundAppointmentController {
     ultrasoundAppointmentService.clearStatuses(ultrasoundAppointment);
     List<UltrasoundStudyStatus> ultrasoundStudyStatuses = new ArrayList<>();
     for (UltrasoundStudyStatusDto ultrasoundStudyStatusDto : confirmUltrasoundAppointmentDto.getUltrasoundStudyStatus()) {
+      System.out.println(ultrasoundStudyStatusDto.toString());
       UltrasoundStudyStatus ultrasoundStudyStatus = new UltrasoundStudyStatus();
       ultrasoundStudyStatus.setUltrasoundAppointment(ultrasoundAppointment);
       ultrasoundStudyStatus.setName(ultrasoundStudyStatusDto.getName());
       ultrasoundStudyStatus.setReason(ultrasoundStudyStatusDto.getReason());
+      ultrasoundStudyStatus.setStatus(
+        StudyStatus.valueOf(ultrasoundStudyStatusDto.getStatus())
+      );
       ultrasoundStudyStatuses.add(ultrasoundStudyStatus);
     }
 

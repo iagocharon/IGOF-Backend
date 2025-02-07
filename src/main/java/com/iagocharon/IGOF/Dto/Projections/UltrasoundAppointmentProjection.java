@@ -23,4 +23,8 @@ public interface UltrasoundAppointmentProjection {
   public double getPlus();
 
   public String getPaymentMethodName();
+
+  public String getPatientName();
+
+  public String getPatientLastname();
 }

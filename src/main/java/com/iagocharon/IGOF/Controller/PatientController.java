@@ -1,9 +1,32 @@
 package com.iagocharon.IGOF.Controller;
 
+import com.iagocharon.IGOF.Dto.EvolutionDto;
+import com.iagocharon.IGOF.Dto.MedicalRecordDto;
+import com.iagocharon.IGOF.Dto.Message;
+import com.iagocharon.IGOF.Dto.PatientDto;
+import com.iagocharon.IGOF.Dto.Projections.PatientProjection;
+import com.iagocharon.IGOF.Dto.UltrasoundStudyReportDto;
+import com.iagocharon.IGOF.Entity.Appointment;
+import com.iagocharon.IGOF.Entity.AppointmentStatus;
+import com.iagocharon.IGOF.Entity.Doctor;
+import com.iagocharon.IGOF.Entity.Evolution;
+import com.iagocharon.IGOF.Entity.MedicalRecord;
+import com.iagocharon.IGOF.Entity.Patient;
+import com.iagocharon.IGOF.Entity.UltrasoundAppointment;
+import com.iagocharon.IGOF.Entity.UltrasoundDoctor;
+import com.iagocharon.IGOF.Entity.UltrasoundStudyReport;
+import com.iagocharon.IGOF.Service.AppointmentService;
+import com.iagocharon.IGOF.Service.DoctorService;
+import com.iagocharon.IGOF.Service.EvolutionService;
+import com.iagocharon.IGOF.Service.InsuranceService;
+import com.iagocharon.IGOF.Service.MedicalRecordService;
+import com.iagocharon.IGOF.Service.PatientService;
+import com.iagocharon.IGOF.Service.UltrasoundAppointmentService;
+import com.iagocharon.IGOF.Service.UltrasoundDoctorService;
+import com.iagocharon.IGOF.Service.UltrasoundStudyReportService;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,24 +39,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.iagocharon.IGOF.Dto.EvolutionDto;
-import com.iagocharon.IGOF.Dto.MedicalRecordDto;
-import com.iagocharon.IGOF.Dto.Message;
-import com.iagocharon.IGOF.Dto.PatientDto;
-import com.iagocharon.IGOF.Dto.Projections.PatientProjection;
-import com.iagocharon.IGOF.Entity.Appointment;
-import com.iagocharon.IGOF.Entity.AppointmentStatus;
-import com.iagocharon.IGOF.Entity.Doctor;
-import com.iagocharon.IGOF.Entity.Evolution;
-import com.iagocharon.IGOF.Entity.MedicalRecord;
-import com.iagocharon.IGOF.Entity.Patient;
-import com.iagocharon.IGOF.Service.AppointmentService;
-import com.iagocharon.IGOF.Service.DoctorService;
-import com.iagocharon.IGOF.Service.EvolutionService;
-import com.iagocharon.IGOF.Service.InsuranceService;
-import com.iagocharon.IGOF.Service.MedicalRecordService;
-import com.iagocharon.IGOF.Service.PatientService;
 
 @RestController
 @RequestMapping("/api/patient")
@@ -56,6 +61,15 @@ public class PatientController {
 
   @Autowired
   AppointmentService appointmentService;
+
+  @Autowired
+  UltrasoundDoctorService ultrasoundDoctorService;
+
+  @Autowired
+  UltrasoundAppointmentService ultrasoundAppointmentService;
+
+  @Autowired
+  UltrasoundStudyReportService ultrasoundStudyReportService;
 
   @GetMapping(value = "list")
   public ResponseEntity<?> list() {
@@ -395,6 +409,113 @@ public class PatientController {
     appointment.setStatus(AppointmentStatus.COMPLETED);
     return new ResponseEntity<>(
       new Message("Evolution updated."),
+      HttpStatus.OK
+    );
+  }
+
+  @PutMapping(value = "new-ultrasound-report")
+  public ResponseEntity<?> newUltrasoundReport(
+    @RequestBody UltrasoundStudyReportDto ultrasoundStudyReportDto,
+    Authentication authentication
+  ) {
+    if (!ultrasoundDoctorService.existsByUsername(authentication.getName())) {
+      return new ResponseEntity<>(
+        new Message("Doctor not found."),
+        HttpStatus.NOT_FOUND
+      );
+    }
+    if (
+      !medicalRecordService.existsById(
+        UUID.fromString(ultrasoundStudyReportDto.getMedicalRecordId())
+      )
+    ) {
+      return new ResponseEntity<>(
+        new Message("Medical record not found."),
+        HttpStatus.NOT_FOUND
+      );
+    }
+    if (
+      !ultrasoundAppointmentService.existsById(
+        UUID.fromString(ultrasoundStudyReportDto.getAppointmentId())
+      )
+    ) {
+      return new ResponseEntity<>(
+        new Message("Appointment not found."),
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    MedicalRecord medicalRecord = medicalRecordService
+      .getById(UUID.fromString(ultrasoundStudyReportDto.getMedicalRecordId()))
+      .get();
+    UltrasoundStudyReport ultrasoundStudyReport = new UltrasoundStudyReport();
+    UltrasoundDoctor ultrasoundDoctor = ultrasoundDoctorService
+      .getByUsername(authentication.getName())
+      .get();
+
+    ultrasoundStudyReport.setTitle(ultrasoundStudyReportDto.getTitle());
+    ultrasoundStudyReport.setDescription(
+      ultrasoundStudyReportDto.getDescription()
+    );
+    ultrasoundStudyReport.setDoctorId(ultrasoundDoctor.getId());
+    ultrasoundStudyReport.setDoctorName(
+      ultrasoundDoctor.getLastname() + ", " + ultrasoundDoctor.getName()
+    );
+    ultrasoundStudyReport.setDate(ZonedDateTime.now());
+    ultrasoundStudyReportService.save(ultrasoundStudyReport);
+    ultrasoundStudyReport.setMedicalRecord(medicalRecord);
+    medicalRecord.addUltrasoundStudyReport(ultrasoundStudyReport);
+    medicalRecordService.save(medicalRecord);
+    ultrasoundStudyReportService.save(ultrasoundStudyReport);
+
+    UltrasoundAppointment ultrasoundAppointment = ultrasoundAppointmentService
+      .getById(UUID.fromString(ultrasoundStudyReportDto.getAppointmentId()))
+      .get();
+    ultrasoundAppointment.setStatus(AppointmentStatus.COMPLETED);
+    ultrasoundAppointmentService.save(ultrasoundAppointment);
+
+    return new ResponseEntity<>(
+      new Message("Ultrasound Report created."),
+      HttpStatus.OK
+    );
+  }
+
+  @PutMapping(value = "update-ultrasound-report")
+  public ResponseEntity<?> updateUltrasoundReport(
+    @RequestBody UltrasoundStudyReportDto ultrasoundStudyReportDto,
+    @RequestParam String id
+  ) {
+    if (!ultrasoundStudyReportService.existsById(UUID.fromString(id))) {
+      return new ResponseEntity<>(
+        new Message("Ultrasound Report not found."),
+        HttpStatus.NOT_FOUND
+      );
+    }
+    if (
+      !ultrasoundAppointmentService.existsById(
+        UUID.fromString(ultrasoundStudyReportDto.getAppointmentId())
+      )
+    ) {
+      return new ResponseEntity<>(
+        new Message("Appointment not found."),
+        HttpStatus.NOT_FOUND
+      );
+    }
+    UltrasoundStudyReport ultrasoundStudyReport = ultrasoundStudyReportService
+      .getById(UUID.fromString(id))
+      .get();
+    ultrasoundStudyReport.setTitle(ultrasoundStudyReportDto.getTitle());
+    ultrasoundStudyReport.setDescription(
+      ultrasoundStudyReportDto.getDescription()
+    );
+    ultrasoundStudyReportService.save(ultrasoundStudyReport);
+
+    UltrasoundAppointment ultrasoundAppointment = ultrasoundAppointmentService
+      .getById(UUID.fromString(ultrasoundStudyReportDto.getAppointmentId()))
+      .get();
+    ultrasoundAppointment.setStatus(AppointmentStatus.COMPLETED);
+    return new ResponseEntity<>(
+      new Message("Ultrasound Report updated."),
       HttpStatus.OK
     );
   }

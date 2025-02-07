@@ -1,11 +1,6 @@
 package com.iagocharon.IGOF.Entity;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +10,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "medical_records")
@@ -306,6 +304,10 @@ public class MedicalRecord {
   @JsonIgnoreProperties("medicalRecord")
   private List<Evolution> evolutions;
 
+  @OneToMany(mappedBy = "medicalRecord")
+  @JsonIgnoreProperties("medicalRecord")
+  private List<UltrasoundStudyReport> ultrasoundStudyReports;
+
   public MedicalRecord() {
     this.asmaFam = "NR";
     this.htaFam = "NR";
@@ -399,6 +401,7 @@ public class MedicalRecord {
     this.transplantes = new ArrayList<>();
     this.otrosProcedimientos = new ArrayList<>();
     this.evolutions = new ArrayList<>();
+    this.ultrasoundStudyReports = new ArrayList<>();
   }
 
   public UUID getId() {
@@ -669,7 +672,9 @@ public class MedicalRecord {
     return enfermedadVascularPeriferica;
   }
 
-  public void setEnfermedadVascularPeriferica(String enfermedadVascularPeriferica) {
+  public void setEnfermedadVascularPeriferica(
+    String enfermedadVascularPeriferica
+  ) {
     this.enfermedadVascularPeriferica = enfermedadVascularPeriferica;
   }
 
@@ -997,7 +1002,9 @@ public class MedicalRecord {
     return tratamientoCronicoConCorticoides;
   }
 
-  public void setTratamientoCronicoConCorticoides(String tratamientoCronicoConCorticoides) {
+  public void setTratamientoCronicoConCorticoides(
+    String tratamientoCronicoConCorticoides
+  ) {
     this.tratamientoCronicoConCorticoides = tratamientoCronicoConCorticoides;
   }
 
@@ -1053,7 +1060,9 @@ public class MedicalRecord {
     return intervencionBypassCoronario;
   }
 
-  public void setIntervencionBypassCoronario(String intervencionBypassCoronario) {
+  public void setIntervencionBypassCoronario(
+    String intervencionBypassCoronario
+  ) {
     this.intervencionBypassCoronario = intervencionBypassCoronario;
   }
 
@@ -1161,4 +1170,25 @@ public class MedicalRecord {
     this.evolutions.remove(evolution);
   }
 
+  public List<UltrasoundStudyReport> getUltrasoundStudyReports() {
+    return this.ultrasoundStudyReports;
+  }
+
+  public void setUltrasoundStudyReports(
+    List<UltrasoundStudyReport> ultrasoundStudyReports
+  ) {
+    this.ultrasoundStudyReports = ultrasoundStudyReports;
+  }
+
+  public void addUltrasoundStudyReport(
+    UltrasoundStudyReport ultrasoundStudyReport
+  ) {
+    this.ultrasoundStudyReports.add(ultrasoundStudyReport);
+  }
+
+  public void removeUltrasoundStudyReport(
+    UltrasoundStudyReport ultrasoundStudyReport
+  ) {
+    this.ultrasoundStudyReports.remove(ultrasoundStudyReport);
+  }
 }

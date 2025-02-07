@@ -2,14 +2,14 @@ package com.iagocharon.IGOF.Dto;
 
 public class UltrasoundAppointmentDto {
 
-  private String start;
-  private String end;
-  private String status;
-  private double plus;
-  private String paymentMethodId;
-  private String ultrasoundDoctorId;
-  private String patientId;
-  private String insuranceId;
+  public String start;
+  public String end;
+  public String status;
+  public double plus;
+  public String paymentMethodId;
+  public String ultrasoundDoctorId;
+  public String patientId;
+  public String insuranceId;
 
   public UltrasoundAppointmentDto() {}
 

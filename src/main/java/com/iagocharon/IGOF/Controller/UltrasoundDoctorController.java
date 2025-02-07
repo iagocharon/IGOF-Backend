@@ -45,6 +45,17 @@ public class UltrasoundDoctorController {
     return new ResponseEntity<>(doctors, HttpStatus.OK);
   }
 
+  @GetMapping(value = "")
+  public ResponseEntity<?> get(@RequestParam String id) {
+    if (!ultrasoundDoctorService.existsById(UUID.fromString(id))) {
+      return new ResponseEntity<>("No doctor found.", HttpStatus.NOT_FOUND);
+    }
+    UltrasoundDoctor doctor = ultrasoundDoctorService
+      .getById(UUID.fromString(id))
+      .get();
+    return new ResponseEntity<>(doctor, HttpStatus.OK);
+  }
+
   @GetMapping(value = "list/study")
   public ResponseEntity<?> listStudy(
     @RequestParam String id,

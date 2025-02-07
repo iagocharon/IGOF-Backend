@@ -62,12 +62,7 @@ public class Insurance {
   )
   @JsonIgnoreProperties(
     {
-      "insurance",
-      "paymentMethod",
-      "surgeryPaymentMethod",
-      "doctor",
-      "patient",
-      "insurance",
+      "paymentMethod", "surgeryPaymentMethod", "doctor", "patient", "insurance",
     }
   )
   private List<Appointment> appointments = new ArrayList<>();

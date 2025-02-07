@@ -18,7 +18,7 @@ public interface UltrasoundAppointmentRepository
   boolean existsById(UUID id);
 
   @Query(
-    "SELECT a FROM Appointment a WHERE a.ultrasoundDoctor.id = :doctorId AND a.start >= :startDate AND a.end <= :endDate AND a.status <> 'CANCELLED' ORDER BY a.start ASC"
+    "SELECT a FROM UltrasoundAppointment a WHERE a.ultrasoundDoctor.id = :doctorId AND a.start >= :startDate AND a.end <= :endDate AND a.status <> 'CANCELLED' ORDER BY a.start ASC"
   )
   List<UltrasoundAppointmentProjection> findAllByDoctorAndDateRange(
     UUID doctorId,
@@ -27,7 +27,7 @@ public interface UltrasoundAppointmentRepository
   );
 
   @Query(
-    "SELECT a FROM Appointment a WHERE a.patient.id = :patientId AND a.start >= :startDate AND a.end <= :endDate ORDER BY a.start ASC"
+    "SELECT a FROM UltrasoundAppointment a WHERE a.patient.id = :patientId AND a.start >= :startDate AND a.end <= :endDate ORDER BY a.start ASC"
   )
   List<UltrasoundAppointmentProjection> findAllByPatientAndDateRange(
     @Param("patientId") UUID patientId,

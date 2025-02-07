@@ -31,4 +31,16 @@ public class UltrasoundStudyStatusDto {
   public void setReason(String reason) {
     this.reason = reason;
   }
+
+  public String toString() {
+    return (
+      "UltrasoundStudyStatusDto [name=" +
+      name +
+      ", status=" +
+      status +
+      ", reason=" +
+      reason +
+      "]"
+    );
+  }
 }
