@@ -15,6 +15,8 @@ public class PatientDto {
   private String state;
   private String country;
   private String citizenship;
+  private String insurance;
+  private String insuranceNumber;
 
   public PatientDto() {}
 
@@ -104,5 +106,21 @@ public class PatientDto {
 
   public void setCitizenship(String citizenship) {
     this.citizenship = citizenship;
+  }
+
+  public String getInsurance() {
+    return this.insurance;
+  }
+
+  public void setInsurance(String insurance) {
+    this.insurance = insurance;
+  }
+
+  public String getInsuranceNumber() {
+    return this.insuranceNumber;
+  }
+
+  public void setInsuranceNumber(String insuranceNumber) {
+    this.insuranceNumber = insuranceNumber;
   }
 }

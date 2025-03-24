@@ -12,6 +12,13 @@ public class PatientSignupRequest {
   private LocalDate birthdate;
   private String insuranceId;
   private String phone;
+  private String address;
+  private String city;
+  private String state;
+  private String country;
+  private String citizenship;
+  private String insurance;
+  private String insuranceNumber;
 
   public PatientSignupRequest() {}
 
@@ -79,6 +86,59 @@ public class PatientSignupRequest {
     this.phone = phone;
   }
 
+  public String getAddress() {
+    return this.address;
+  }
 
+  public void setAddress(String address) {
+    this.address = address;
+  }
 
+  public String getCity() {
+    return this.city;
+  }
+
+  public void setCity(String city) {
+    this.city = city;
+  }
+
+  public String getState() {
+    return this.state;
+  }
+
+  public void setState(String state) {
+    this.state = state;
+  }
+
+  public String getCountry() {
+    return this.country;
+  }
+
+  public void setCountry(String country) {
+    this.country = country;
+  }
+
+  public String getCitizenship() {
+    return this.citizenship;
+  }
+
+  public void setCitizenship(String citizenship) {
+    this.citizenship = citizenship;
+  }
+
+  public String getInsurance() {
+    return this.insurance;
+  }
+
+  public void setInsurance(String insurance) {
+    this.insurance = insurance;
+  }
+
+  public String getInsuranceNumber() {
+    return this.insuranceNumber;
+  }
+
+  public void setInsuranceNumber(String insuranceNumber) {
+    this.insuranceNumber = insuranceNumber;
+  }
 }

@@ -66,6 +66,13 @@ public class AuthService {
     user.setLastname(request.getLastname());
     user.setBirthdate(request.getBirthdate());
     user.setPhone(request.getPhone());
+    user.setAddress(request.getAddress());
+    user.setCity(request.getCity());
+    user.setState(request.getState());
+    user.setCountry(request.getCountry());
+    user.setCitizenship(request.getCitizenship());
+    user.setInsurance(request.getInsurance());
+    user.setInsuranceNumber(request.getInsuranceNumber());
 
     user = patientService.save(user);
 

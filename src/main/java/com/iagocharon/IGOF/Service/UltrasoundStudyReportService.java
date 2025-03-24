@@ -35,6 +35,6 @@ public class UltrasoundStudyReportService {
   }
 
   public List<UltrasoundStudyReport> getAll() {
-    return ultrasoundStudyReportRepository.findAll();
+    return ultrasoundStudyReportRepository.findAllByOrderByDateDesc();
   }
 }

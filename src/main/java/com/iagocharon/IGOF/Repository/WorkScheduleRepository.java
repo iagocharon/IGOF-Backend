@@ -23,6 +23,11 @@ public interface WorkScheduleRepository
     LocalDate endDate
   );
 
+  List<WorkSchedule> findByUltrasoundDoctorIdAndDate(
+    UUID ultrasoundDoctorId,
+    LocalDate date
+  );
+
   List<WorkSchedule> findByUltrasoundDoctorIdAndDateBetween(
     UUID ultrasoundDoctorId,
     LocalDate startDate,

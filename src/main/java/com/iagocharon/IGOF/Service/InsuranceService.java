@@ -1,19 +1,17 @@
 package com.iagocharon.IGOF.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import com.iagocharon.IGOF.Dto.Projections.InsuranceProjection;
 import com.iagocharon.IGOF.Entity.Doctor;
 import com.iagocharon.IGOF.Entity.Insurance;
 import com.iagocharon.IGOF.Repository.DoctorRepository;
 import com.iagocharon.IGOF.Repository.InsuranceRepository;
 import com.iagocharon.IGOF.Repository.PatientRepository;
-
 import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
@@ -66,7 +64,11 @@ public class InsuranceService {
     insuranceRepository.deleteById(id);
   }
 
-  public List<Insurance> getAll() {
+  public List<InsuranceProjection> getAll() {
+    return insuranceRepository.findAllProjectedBy();
+  }
+
+  public List<Insurance> getAllInsurances() {
     return insuranceRepository.findAll();
   }
 

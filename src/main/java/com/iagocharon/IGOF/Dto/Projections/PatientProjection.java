@@ -17,4 +17,8 @@ public interface PatientProjection {
   public String getPhone();
 
   public LocalDate getBirthdate();
+
+  public String getInsurance();
+
+  public String getInsuranceNumber();
 }

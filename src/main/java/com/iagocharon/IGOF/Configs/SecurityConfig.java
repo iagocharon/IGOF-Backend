@@ -45,13 +45,16 @@ public class SecurityConfig {
             "http://localhost:4200",
             "http://localhost:4201",
             "http://localhost:4202",
+            "http://localhost:4203",
             "https://pacientes.igof.com.ar",
             "https://medicos.igof.com.ar",
             "https://admin.igof.com.ar",
+            "https://ecografias.igof.com.ar",
             "https://igof.com.ar",
             "https://www.pacientes.igof.com.ar",
             "https://www.medicos.igof.com.ar",
             "https://www.admin.igof.com.ar",
+            "https://www.ecografias.igof.com.ar",
             "https://www.igof.com.ar"
           )
           .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")

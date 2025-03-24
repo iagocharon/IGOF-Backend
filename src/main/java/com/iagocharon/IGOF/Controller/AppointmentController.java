@@ -12,6 +12,7 @@ import com.iagocharon.IGOF.Entity.Patient;
 import com.iagocharon.IGOF.Entity.PaymentMethod;
 import com.iagocharon.IGOF.Service.AppointmentService;
 import com.iagocharon.IGOF.Service.DoctorService;
+import com.iagocharon.IGOF.Service.EmailService;
 import com.iagocharon.IGOF.Service.InsuranceService;
 import com.iagocharon.IGOF.Service.PatientService;
 import com.iagocharon.IGOF.Service.PaymentMethodService;
@@ -49,6 +50,9 @@ public class AppointmentController {
 
   @Autowired
   InsuranceService insuranceService;
+
+  @Autowired
+  EmailService emailService;
 
   @GetMapping(value = "list")
   public ResponseEntity<?> list() {
@@ -175,6 +179,19 @@ public class AppointmentController {
     insurance.addAppointment(appointment);
     insuranceService.save(insurance);
 
+    String subject = "Confirmación de turno";
+    String body = String.format(
+      "Hola %s,\n\nTu turno con el Dr. %s, %s ha sido confirmado para el %s a las %s. \n\nRecordá que en caso de no poder asistir al turno, podés cancelarlo desde el portal de autogestión hasta 24 horas antes del mismo en el siguiente link:\n<a href='https://pacientes.igof.com.ar'>Portal de Autogestión</a>.\n\nSaludos, \nClínica IGOF",
+      patient.getName(),
+      doctor.getLastname(),
+      doctor.getName(),
+      appointment.getStart().toLocalDate(),
+      appointment.getStart().toLocalTime()
+    );
+    emailService.sendNewMail(patient.getEmail(), subject, body);
+
+    emailService.scheduleReminder(appointment);
+
     return new ResponseEntity<>(
       new Message("Appointment created successfully."),
       HttpStatus.OK
@@ -290,6 +307,25 @@ public class AppointmentController {
       .get();
     appointment.setStatus(AppointmentStatus.CANCELLED);
     appointmentService.save(appointment);
+
+    emailService.cancelReminder(appointment.getId());
+
+    emailService.sendNewMail(
+      appointment.getPatient().getEmail(),
+      "Turno cancelado",
+      "Hola " +
+      appointment.getPatient().getName() +
+      ", te informamos que tu turno con el Dr. " +
+      appointment.getDoctor().getLastname() +
+      ", " +
+      appointment.getDoctor().getName() +
+      " para el " +
+      appointment.getStart().toLocalDate() +
+      " a las " +
+      appointment.getStart().toLocalTime() +
+      " ha sido cancelado."
+    );
+
     return new ResponseEntity<>(
       new Message("Appointment cancelled successfully."),
       HttpStatus.OK

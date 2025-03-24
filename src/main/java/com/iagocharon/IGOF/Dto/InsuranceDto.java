@@ -4,7 +4,7 @@ public class InsuranceDto {
 
   private String name;
 
-  private int dailyLimit;
+  private String insuranceParentId;
 
   public InsuranceDto() {}
 
@@ -16,11 +16,25 @@ public class InsuranceDto {
     this.name = name;
   }
 
-  public int getDailyLimit() {
-    return this.dailyLimit;
+  public String getInsuranceParentId() {
+    return this.insuranceParentId;
   }
 
-  public void setDailyLimit(int dailyLimit) {
-    this.dailyLimit = dailyLimit;
+  public void setInsuranceParentId(String insuranceParentId) {
+    this.insuranceParentId = insuranceParentId;
+  }
+
+  @Override
+  public String toString() {
+    return (
+      "InsuranceDto{" +
+      "name='" +
+      name +
+      '\'' +
+      ", insuranceParentId='" +
+      insuranceParentId +
+      '\'' +
+      '}'
+    );
   }
 }

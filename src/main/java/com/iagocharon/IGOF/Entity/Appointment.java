@@ -166,11 +166,11 @@ public class Appointment {
   }
 
   public UUID getInsuranceId() {
-    return insurance.getId();
+    return insurance.getInsuranceParent().getId();
   }
 
   public int getInsuranceDailyLimit() {
-    return insurance.getDailyLimit();
+    return insurance.getInsuranceParent().getDailyLimit();
   }
 
   public String getAppointmentStatusString() {

@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
@@ -53,8 +54,6 @@ public class Insurance {
   )
   private List<UltrasoundDoctor> ultrasoundDoctors;
 
-  private int dailyLimit;
-
   @OneToMany(
     mappedBy = "insurance",
     fetch = FetchType.LAZY,
@@ -85,9 +84,13 @@ public class Insurance {
   private List<UltrasoundAppointment> ultrasoundAppointments =
     new ArrayList<>();
 
+  @ManyToOne(fetch = FetchType.EAGER)
+  @JoinColumn(name = "insurance_parent_id")
+  @JsonIgnoreProperties("insurances")
+  private InsuranceParent insuranceParent;
+
   public Insurance() {
     doctors = new ArrayList<>();
-    dailyLimit = 0;
   }
 
   public UUID getId() {
@@ -120,14 +123,6 @@ public class Insurance {
 
   public void removeDoctor(Doctor doctor) {
     doctors.remove(doctor);
-  }
-
-  public int getDailyLimit() {
-    return this.dailyLimit;
-  }
-
-  public void setDailyLimit(int dailyLimit) {
-    this.dailyLimit = dailyLimit;
   }
 
   public List<Appointment> getAppointments() {
@@ -186,5 +181,21 @@ public class Insurance {
   ) {
     this.ultrasoundAppointments.remove(ultrasoundAppointment);
     ultrasoundAppointment.setInsurance(null);
+  }
+
+  public InsuranceParent getInsuranceParent() {
+    return this.insuranceParent;
+  }
+
+  public void setInsuranceParent(InsuranceParent insuranceParent) {
+    this.insuranceParent = insuranceParent;
+  }
+
+  public String getInsuranceParentName() {
+    return this.insuranceParent.getName();
+  }
+
+  public UUID getInsuranceParentId() {
+    return this.insuranceParent.getId();
   }
 }

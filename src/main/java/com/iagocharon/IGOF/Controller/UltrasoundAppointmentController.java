@@ -13,6 +13,7 @@ import com.iagocharon.IGOF.Entity.StudyStatus;
 import com.iagocharon.IGOF.Entity.UltrasoundAppointment;
 import com.iagocharon.IGOF.Entity.UltrasoundDoctor;
 import com.iagocharon.IGOF.Entity.UltrasoundStudyStatus;
+import com.iagocharon.IGOF.Service.EmailService;
 import com.iagocharon.IGOF.Service.InsuranceService;
 import com.iagocharon.IGOF.Service.PatientService;
 import com.iagocharon.IGOF.Service.PaymentMethodService;
@@ -54,6 +55,9 @@ public class UltrasoundAppointmentController {
   @Autowired
   InsuranceService insuranceService;
 
+  @Autowired
+  EmailService emailService;
+
   @GetMapping(value = "list")
   public ResponseEntity<?> list() {
     return ResponseEntity.ok(ultrasoundAppointmentService.getAll());
@@ -80,6 +84,7 @@ public class UltrasoundAppointmentController {
     @RequestParam String from,
     @RequestParam String to
   ) {
+    System.out.println("Doctor ID: " + id);
     DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
     ZonedDateTime startDate = ZonedDateTime.parse(from, formatter);
     ZonedDateTime endDate = ZonedDateTime.parse(to, formatter);
@@ -90,6 +95,8 @@ public class UltrasoundAppointmentController {
         startDate,
         endDate
       );
+
+    System.out.println("Appointments: " + appointments);
 
     return new ResponseEntity<>(appointments, HttpStatus.OK);
   }
@@ -181,6 +188,19 @@ public class UltrasoundAppointmentController {
     patientService.save(patient);
     insurance.addUltrasoundAppointment(ultrasoundAppointment);
     insuranceService.save(insurance);
+
+    String subject = "Confirmación de turno";
+    String body = String.format(
+      "Hola %s,\n\nTu turno con el Dr. %s, %s ha sido confirmado para el %s a las %s. \n\nRecordá que en caso de no poder asistir al turno, podés cancelarlo desde el portal de autogestión hasta 24 horas antes del mismo en el siguiente link:\n<a href='https://pacientes.igof.com.ar'>Portal de Autogestión</a>.\n\nSaludos, \nClínica IGOF",
+      patient.getName(),
+      ultrasoundDoctor.getLastname(),
+      ultrasoundDoctor.getName(),
+      ultrasoundAppointment.getStart().toLocalDate(),
+      ultrasoundAppointment.getStart().toLocalTime()
+    );
+    emailService.sendNewMail(patient.getEmail(), subject, body);
+
+    emailService.scheduleUltrasoundReminder(ultrasoundAppointment);
 
     return new ResponseEntity<>(
       new Message("Appointment created successfully."),
@@ -284,6 +304,25 @@ public class UltrasoundAppointmentController {
       .get();
     ultrasoundAppointment.setStatus(AppointmentStatus.CANCELLED);
     ultrasoundAppointmentService.save(ultrasoundAppointment);
+
+    emailService.cancelReminder(ultrasoundAppointment.getId());
+
+    emailService.sendNewMail(
+      ultrasoundAppointment.getPatient().getEmail(),
+      "Turno cancelado",
+      "Hola " +
+      ultrasoundAppointment.getPatient().getName() +
+      ", te informamos que tu turno con el Dr. " +
+      ultrasoundAppointment.getUltrasoundDoctor().getLastname() +
+      ", " +
+      ultrasoundAppointment.getUltrasoundDoctor().getName() +
+      " para el " +
+      ultrasoundAppointment.getStart().toLocalDate() +
+      " a las " +
+      ultrasoundAppointment.getStart().toLocalTime() +
+      " ha sido cancelado."
+    );
+
     return new ResponseEntity<>(
       new Message("Appointment cancelled successfully."),
       HttpStatus.OK

@@ -164,7 +164,7 @@ public class UltrasoundAppointment {
   }
 
   public int getInsuranceDailyLimit() {
-    return insurance.getDailyLimit();
+    return insurance.getInsuranceParent().getDailyLimit();
   }
 
   public String getAppointmentStatuString() {
@@ -188,7 +188,7 @@ public class UltrasoundAppointment {
   }
 
   public UUID getInsuranceId() {
-    return insurance.getId();
+    return insurance.getInsuranceParent().getId();
   }
 
   public UUID getUltrasoundDoctorId() {
@@ -197,5 +197,9 @@ public class UltrasoundAppointment {
 
   public String getAppointmentStatusString() {
     return status.toString();
+  }
+
+  public String getInsuranceName() {
+    return insurance.getName();
   }
 }

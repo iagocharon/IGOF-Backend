@@ -41,6 +41,9 @@ public class Patient extends User {
   @JsonIgnoreProperties("patient")
   private MedicalRecord medicalRecord;
 
+  private String insurance;
+  private String insuranceNumber;
+
   public Patient() {
     appointments = new ArrayList<>();
   }
@@ -145,5 +148,21 @@ public class Patient extends User {
     UltrasoundAppointment ultrasoundAppointment
   ) {
     this.ultrasoundAppointments.remove(ultrasoundAppointment);
+  }
+
+  public String getInsurance() {
+    return this.insurance;
+  }
+
+  public void setInsurance(String insurance) {
+    this.insurance = insurance;
+  }
+
+  public String getInsuranceNumber() {
+    return this.insuranceNumber;
+  }
+
+  public void setInsuranceNumber(String insuranceNumber) {
+    this.insuranceNumber = insuranceNumber;
   }
 }

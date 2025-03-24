@@ -129,6 +129,7 @@ public class PatientController {
     patient.setState(patientDto.getState());
     patient.setCountry(patientDto.getCountry());
     patient.setCitizenship(patientDto.getCitizenship());
+    patient.setInsurance(patientDto.getInsurance());
 
     patientService.save(patient);
 
@@ -158,6 +159,8 @@ public class PatientController {
     patient.setPhone(patientDto.getPhone());
     patient.setState(patientDto.getState());
     patient.setUsername(patientDto.getUsername());
+    patient.setInsurance(patientDto.getInsurance());
+    patient.setInsuranceNumber(patientDto.getInsuranceNumber());
     patientService.save(patient);
     return new ResponseEntity<>(new Message("User updated."), HttpStatus.OK);
   }
@@ -389,24 +392,10 @@ public class PatientController {
         HttpStatus.NOT_FOUND
       );
     }
-    if (
-      !appointmentService.existsById(
-        UUID.fromString(evolutionDto.getAppointmentId())
-      )
-    ) {
-      return new ResponseEntity<>(
-        new Message("Appointment not found."),
-        HttpStatus.NOT_FOUND
-      );
-    }
     Evolution evolution = evolutionService.getById(UUID.fromString(id)).get();
     evolution.setDescription(evolutionDto.getDescription());
     evolutionService.save(evolution);
 
-    Appointment appointment = appointmentService
-      .getById(UUID.fromString(evolutionDto.getAppointmentId()))
-      .get();
-    appointment.setStatus(AppointmentStatus.COMPLETED);
     return new ResponseEntity<>(
       new Message("Evolution updated."),
       HttpStatus.OK
@@ -491,16 +480,6 @@ public class PatientController {
         HttpStatus.NOT_FOUND
       );
     }
-    if (
-      !ultrasoundAppointmentService.existsById(
-        UUID.fromString(ultrasoundStudyReportDto.getAppointmentId())
-      )
-    ) {
-      return new ResponseEntity<>(
-        new Message("Appointment not found."),
-        HttpStatus.NOT_FOUND
-      );
-    }
     UltrasoundStudyReport ultrasoundStudyReport = ultrasoundStudyReportService
       .getById(UUID.fromString(id))
       .get();
@@ -510,10 +489,6 @@ public class PatientController {
     );
     ultrasoundStudyReportService.save(ultrasoundStudyReport);
 
-    UltrasoundAppointment ultrasoundAppointment = ultrasoundAppointmentService
-      .getById(UUID.fromString(ultrasoundStudyReportDto.getAppointmentId()))
-      .get();
-    ultrasoundAppointment.setStatus(AppointmentStatus.COMPLETED);
     return new ResponseEntity<>(
       new Message("Ultrasound Report updated."),
       HttpStatus.OK

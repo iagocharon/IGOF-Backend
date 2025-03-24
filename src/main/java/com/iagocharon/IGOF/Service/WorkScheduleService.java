@@ -48,6 +48,13 @@ public class WorkScheduleService {
     workScheduleRepository.deleteById(id);
   }
 
+  public List<WorkSchedule> findByDoctorIdAndDate(
+    UUID doctorId,
+    LocalDate date
+  ) {
+    return workScheduleRepository.findByDoctorIdAndDate(doctorId, date);
+  }
+
   public List<WorkSchedule> findDoctorBetweenDates(
     UUID doctorId,
     LocalDate startDate,
@@ -57,6 +64,16 @@ public class WorkScheduleService {
       doctorId,
       startDate,
       endDate
+    );
+  }
+
+  public List<WorkSchedule> findByUltrasoundDoctorIdAndDate(
+    UUID ultrasoundDoctorId,
+    LocalDate date
+  ) {
+    return workScheduleRepository.findByUltrasoundDoctorIdAndDate(
+      ultrasoundDoctorId,
+      date
     );
   }
 

@@ -1,6 +1,7 @@
 package com.iagocharon.IGOF.Repository;
 
 import com.iagocharon.IGOF.Entity.UltrasoundStudyReport;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,6 @@ public interface UltrasoundStudyReportRepository
   Optional<UltrasoundStudyReport> findById(UUID id);
 
   boolean existsById(UUID id);
+
+  List<UltrasoundStudyReport> findAllByOrderByDateDesc();
 }
