@@ -79,11 +79,11 @@ public class Utils implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
-    createInsurancesAndPatients();
-    createPaymentMethods();
-    createAdmin("admin", "admin", "admin@admin.com", "admin", "admin");
-    createDoctors();
-    createUltrasoundDoctors();
+    // createInsurancesAndPatients();
+    // createPaymentMethods();
+    // createAdmin("admin", "admin", "admin@admin.com", "admin", "admin");
+    // createDoctors();
+    // createUltrasoundDoctors();
   }
 
   public void createInsurancesAndPatients() {

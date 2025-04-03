@@ -10,7 +10,6 @@ public class PatientSignupRequest {
   private String name;
   private String lastname;
   private LocalDate birthdate;
-  private String insuranceId;
   private String phone;
   private String address;
   private String city;
@@ -68,14 +67,6 @@ public class PatientSignupRequest {
 
   public void setBirthdate(LocalDate birthdate) {
     this.birthdate = birthdate;
-  }
-
-  public String getInsuranceId() {
-    return insuranceId;
-  }
-
-  public void setInsuranceId(String insuranceId) {
-    this.insuranceId = insuranceId;
   }
 
   public String getPhone() {
