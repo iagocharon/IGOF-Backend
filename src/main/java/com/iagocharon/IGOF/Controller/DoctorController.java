@@ -1,8 +1,18 @@
 package com.iagocharon.IGOF.Controller;
 
+import com.iagocharon.IGOF.Dto.DoctorSignupRequest;
+import com.iagocharon.IGOF.Dto.Message;
+import com.iagocharon.IGOF.Dto.Projections.DoctorProjection;
+import com.iagocharon.IGOF.Entity.Doctor;
+import com.iagocharon.IGOF.Entity.Insurance;
+import com.iagocharon.IGOF.Entity.Specialty;
+import com.iagocharon.IGOF.Service.AuthService;
+import com.iagocharon.IGOF.Service.DoctorService;
+import com.iagocharon.IGOF.Service.InsuranceService;
+import com.iagocharon.IGOF.Service.SpecialtyService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.iagocharon.IGOF.Dto.DoctorSignupRequest;
-import com.iagocharon.IGOF.Dto.Message;
-import com.iagocharon.IGOF.Dto.Projections.DoctorProjection;
-import com.iagocharon.IGOF.Entity.Doctor;
-import com.iagocharon.IGOF.Entity.Insurance;
-import com.iagocharon.IGOF.Entity.Specialty;
-import com.iagocharon.IGOF.Service.AuthService;
-import com.iagocharon.IGOF.Service.DoctorService;
-import com.iagocharon.IGOF.Service.InsuranceService;
-import com.iagocharon.IGOF.Service.SpecialtyService;
 
 @RestController
 @RequestMapping("/api/doctor")
@@ -118,32 +117,46 @@ public class DoctorController {
     doctor.setEmail(request.getEmail());
     doctor.setName(request.getName());
     doctor.setLastname(request.getLastname());
-    List<Specialty> specialties = request
-      .getSpecialtyIds()
-      .stream()
-      .map(specialtyId ->
-        specialtyService
-          .getById(UUID.fromString(specialtyId))
-          .orElseThrow(() ->
-            new IllegalArgumentException("Specialty not found: " + specialtyId)
+    // Agregar verificación para specialtyIds
+    List<Specialty> specialties = request.getSpecialtyIds() != null
+      ? new ArrayList<>(
+        request
+          .getSpecialtyIds()
+          .stream()
+          .map(specialtyId ->
+            specialtyService
+              .getById(UUID.fromString(specialtyId))
+              .orElseThrow(() ->
+                new IllegalArgumentException(
+                  "Specialty not found: " + specialtyId
+                )
+              )
           )
-      )
-      .toList();
+          .toList()
+      ) // Envolver en new ArrayList<>()
+      : new ArrayList<>();
     doctor.setSpecialties(specialties);
 
     final Doctor finalDoctor = doctor;
     specialties.forEach(specialty -> specialty.addDoctor(finalDoctor));
-    List<Insurance> insurances = request
-      .getInsurancesIds()
-      .stream()
-      .map(insuranceId ->
-        insuranceService
-          .getById(UUID.fromString(insuranceId))
-          .orElseThrow(() ->
-            new IllegalArgumentException("Insurance not found: " + insuranceId)
+    // Verificar también insurancesIds
+    List<Insurance> insurances = request.getInsurancesIds() != null
+      ? new ArrayList<>(
+        request
+          .getInsurancesIds()
+          .stream()
+          .map(insuranceId ->
+            insuranceService
+              .getById(UUID.fromString(insuranceId))
+              .orElseThrow(() ->
+                new IllegalArgumentException(
+                  "Insurance not found: " + insuranceId
+                )
+              )
           )
-      )
-      .toList();
+          .toList()
+      ) // Envolver en ArrayList mutable
+      : new ArrayList<>();
     doctor.setInsurances(insurances);
 
     insurances.forEach(insurance -> insurance.addDoctor(finalDoctor));

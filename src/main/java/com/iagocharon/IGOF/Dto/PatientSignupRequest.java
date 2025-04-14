@@ -1,7 +1,5 @@
 package com.iagocharon.IGOF.Dto;
 
-import java.time.LocalDate;
-
 public class PatientSignupRequest {
 
   private String username;
@@ -9,7 +7,7 @@ public class PatientSignupRequest {
   private String email;
   private String name;
   private String lastname;
-  private LocalDate birthdate;
+  private String birthdate;
   private String phone;
   private String address;
   private String city;
@@ -61,11 +59,11 @@ public class PatientSignupRequest {
     this.lastname = lastname;
   }
 
-  public LocalDate getBirthdate() {
+  public String getBirthdate() {
     return birthdate;
   }
 
-  public void setBirthdate(LocalDate birthdate) {
+  public void setBirthdate(String birthdate) {
     this.birthdate = birthdate;
   }
 

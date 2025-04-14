@@ -1,122 +1,29 @@
-2025-03-27 11:52:39 - Starting IgofApplication using Java 17.0.14 with PID 69376 (/Users/IAGO/Desktop/Trabajo/Clientes/IGOF/IGOF-Backend/target/classes started by IAGO in /Users/IAGO/Desktop/Trabajo/Clientes/IGOF/IGOF-Backend)
-2025-03-27 11:52:39 - Running with Spring Boot v3.3.4, Spring v6.1.13
-2025-03-27 11:52:39 - No active profile set, falling back to 1 default profile: "default"
-2025-03-27 11:52:39 - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
-2025-03-27 11:52:39 - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
-2025-03-27 11:52:39 - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2025-03-27 11:52:39 - Finished Spring Data repository scanning in 27 ms. Found 16 JPA repository interfaces.
-2025-03-27 11:52:40 - Tomcat initialized with port 8443 (http)
-2025-03-27 11:52:40 - Starting service [Tomcat]
-2025-03-27 11:52:40 - Starting Servlet engine: [Apache Tomcat/10.1.30]
-2025-03-27 11:52:40 - Initializing Spring embedded WebApplicationContext
-2025-03-27 11:52:40 - Root WebApplicationContext: initialization completed in 508 ms
-2025-03-27 11:52:40 - HHH000204: Processing PersistenceUnitInfo [name: default]
-2025-03-27 11:52:40 - HHH000412: Hibernate ORM core version 6.5.3.Final
-2025-03-27 11:52:40 - HHH000026: Second-level cache disabled
-2025-03-27 11:52:40 - No LoadTimeWeaver setup: ignoring JPA class transformer
-2025-03-27 11:52:40 - HikariPool-1 - Starting...
-2025-03-27 11:52:40 - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@3a1d2d69
-2025-03-27 11:52:40 - HikariPool-1 - Start completed.
-2025-03-27 11:52:40 - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2025-03-27 11:52:40 - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2025-03-27 11:52:41 - Initialized JPA EntityManagerFactory for persistence unit 'default'
-2025-03-27 11:52:41 - Filter 'jwtAuthenticationFilter' configured for use
-2025-03-27 11:52:41 - Hibernate is in classpath; If applicable, HQL parser will be used.
-2025-03-27 11:52:42 - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2025-03-27 11:52:42 - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
-2025-03-27 11:52:42 - LiveReload server is running on port 35729
-2025-03-27 11:52:42 - Tomcat started on port 8443 (http) with context path '/'
-2025-03-27 11:52:42 - Started IgofApplication in 2.701 seconds (process running for 2.929)
-2025-03-27 11:52:42 - SQL Error: 1062, SQLState: 23000
-2025-03-27 11:52:42 - Duplicate entry 'Efectivo' for key 'payment_methods.UKkxvufx13wi6icen4i2wltdj02'
-2025-03-27 11:52:42 - 
-
-Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-2025-03-27 11:52:42 - Application run failed
-org.springframework.dao.DataIntegrityViolationException: could not execute statement [Duplicate entry 'Efectivo' for key 'payment_methods.UKkxvufx13wi6icen4i2wltdj02'] [insert into payment_methods (name,id) values (?,?)]; SQL [insert into payment_methods (name,id) values (?,?)]; constraint [payment_methods.UKkxvufx13wi6icen4i2wltdj02]
-	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:290)
-	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:241)
-	at org.springframework.orm.jpa.JpaTransactionManager.doCommit(JpaTransactionManager.java:566)
-	at org.springframework.transaction.support.AbstractPlatformTransactionManager.processCommit(AbstractPlatformTransactionManager.java:795)
-	at org.springframework.transaction.support.AbstractPlatformTransactionManager.commit(AbstractPlatformTransactionManager.java:758)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.commitTransactionAfterReturning(TransactionAspectSupport.java:663)
-	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:413)
-	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:119)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
-	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:138)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
-	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:165)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
-	at org.springframework.aop.interceptor.ExposeInvocationInterceptor.invoke(ExposeInvocationInterceptor.java:97)
-	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
-	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:223)
-	at jdk.proxy4/jdk.proxy4.$Proxy151.save(Unknown Source)
-	at com.iagocharon.IGOF.Utils.createPaymentMethods(Utils.java:836)
-	at com.iagocharon.IGOF.Utils.run(Utils.java:83)
-	at org.springframework.boot.SpringApplication.lambda$callRunner$5(SpringApplication.java:790)
-	at org.springframework.util.function.ThrowingConsumer$1.acceptWithException(ThrowingConsumer.java:83)
-	at org.springframework.util.function.ThrowingConsumer.accept(ThrowingConsumer.java:60)
-	at org.springframework.util.function.ThrowingConsumer$1.accept(ThrowingConsumer.java:88)
-	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:798)
-	at org.springframework.boot.SpringApplication.callRunner(SpringApplication.java:789)
-	at org.springframework.boot.SpringApplication.lambda$callRunners$3(SpringApplication.java:774)
-	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
-	at java.base/java.util.stream.SortedOps$SizedRefSortingSink.end(SortedOps.java:357)
-	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:510)
-	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
-	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
-	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
-	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
-	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
-	at org.springframework.boot.SpringApplication.callRunners(SpringApplication.java:774)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:342)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363)
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352)
-	at com.iagocharon.IGOF.IgofApplication.main(IgofApplication.java:10)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
-	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
-Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement [Duplicate entry 'Efectivo' for key 'payment_methods.UKkxvufx13wi6icen4i2wltdj02'] [insert into payment_methods (name,id) values (?,?)]
-	at org.hibernate.dialect.MySQLDialect.lambda$buildSQLExceptionConversionDelegate$3(MySQLDialect.java:1243)
-	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:58)
-	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:108)
-	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:197)
-	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.performNonBatchedMutation(AbstractMutationExecutor.java:134)
-	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:55)
-	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:55)
-	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.doStaticInserts(InsertCoordinatorStandard.java:194)
-	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.coordinateInsert(InsertCoordinatorStandard.java:132)
-	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.insert(InsertCoordinatorStandard.java:104)
-	at org.hibernate.action.internal.EntityInsertAction.execute(EntityInsertAction.java:110)
-	at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:633)
-	at org.hibernate.engine.spi.ActionQueue.executeActions(ActionQueue.java:500)
-	at org.hibernate.event.internal.AbstractFlushingEventListener.performExecutions(AbstractFlushingEventListener.java:385)
-	at org.hibernate.event.internal.DefaultFlushEventListener.onFlush(DefaultFlushEventListener.java:41)
-	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:127)
-	at org.hibernate.internal.SessionImpl.doFlush(SessionImpl.java:1425)
-	at org.hibernate.internal.SessionImpl.managedFlush(SessionImpl.java:487)
-	at org.hibernate.internal.SessionImpl.flushBeforeTransactionCompletion(SessionImpl.java:2324)
-	at org.hibernate.internal.SessionImpl.beforeTransactionCompletion(SessionImpl.java:1981)
-	at org.hibernate.engine.jdbc.internal.JdbcCoordinatorImpl.beforeTransactionCompletion(JdbcCoordinatorImpl.java:439)
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl.beforeCompletionCallback(JdbcResourceLocalTransactionCoordinatorImpl.java:169)
-	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.commit(JdbcResourceLocalTransactionCoordinatorImpl.java:267)
-	at org.hibernate.engine.transaction.internal.TransactionImpl.commit(TransactionImpl.java:101)
-	at org.springframework.orm.jpa.JpaTransactionManager.doCommit(JpaTransactionManager.java:562)
-	... 41 common frames omitted
-Caused by: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry 'Efectivo' for key 'payment_methods.UKkxvufx13wi6icen4i2wltdj02'
-	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:118)
-	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:122)
-	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:912)
-	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1054)
-	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1003)
-	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1312)
-	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:988)
-	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
-	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
-	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:194)
-	... 62 common frames omitted
-2025-03-27 11:52:42 - Closing JPA EntityManagerFactory for persistence unit 'default'
-2025-03-27 11:52:42 - HikariPool-1 - Shutdown initiated...
-2025-03-27 11:52:42 - HikariPool-1 - Shutdown completed.
+2025-04-14 00:53:41 - Starting IgofApplication using Java 17.0.14 with PID 16193 (/Users/IAGO/Desktop/Trabajo/Clientes/IGOF/IGOF-Backend/target/classes started by IAGO in /Users/IAGO/Desktop/Trabajo/Clientes/IGOF/IGOF-Backend)
+2025-04-14 00:53:41 - Running with Spring Boot v3.3.4, Spring v6.1.13
+2025-04-14 00:53:41 - No active profile set, falling back to 1 default profile: "default"
+2025-04-14 00:53:41 - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2025-04-14 00:53:41 - For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2025-04-14 00:53:42 - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-04-14 00:53:42 - Finished Spring Data repository scanning in 29 ms. Found 16 JPA repository interfaces.
+2025-04-14 00:53:42 - Tomcat initialized with port 8443 (http)
+2025-04-14 00:53:42 - Starting service [Tomcat]
+2025-04-14 00:53:42 - Starting Servlet engine: [Apache Tomcat/10.1.30]
+2025-04-14 00:53:42 - Initializing Spring embedded WebApplicationContext
+2025-04-14 00:53:42 - Root WebApplicationContext: initialization completed in 491 ms
+2025-04-14 00:53:42 - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-04-14 00:53:42 - HHH000412: Hibernate ORM core version 6.5.3.Final
+2025-04-14 00:53:42 - HHH000026: Second-level cache disabled
+2025-04-14 00:53:42 - No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-04-14 00:53:42 - HikariPool-1 - Starting...
+2025-04-14 00:53:42 - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@77f19868
+2025-04-14 00:53:42 - HikariPool-1 - Start completed.
+2025-04-14 00:53:42 - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-04-14 00:53:43 - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-04-14 00:53:43 - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-04-14 00:53:43 - Filter 'jwtAuthenticationFilter' configured for use
+2025-04-14 00:53:44 - Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-04-14 00:53:44 - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-04-14 00:53:44 - Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2025-04-14 00:53:44 - LiveReload server is running on port 35729
+2025-04-14 00:53:44 - Tomcat started on port 8443 (http) with context path '/'
+2025-04-14 00:53:44 - Started IgofApplication in 2.779 seconds (process running for 3.012)

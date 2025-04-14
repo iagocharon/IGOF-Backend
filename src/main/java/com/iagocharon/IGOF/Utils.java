@@ -30,6 +30,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -81,9 +82,22 @@ public class Utils implements CommandLineRunner {
   public void run(String... args) {
     // createInsurancesAndPatients();
     // createPaymentMethods();
-    // createAdmin("admin", "admin", "admin@admin.com", "admin", "admin");
+    // createAdmin(
+    //   "adminIGOF",
+    //   "Admin@2025",
+    //   "admins@igof.com.ar",
+    //   "Admins",
+    //   "IGOF"
+    // );
     // createDoctors();
     // createUltrasoundDoctors();
+
+    Optional<User> admin = userRepository.findByUsername("admin");
+    User user = admin.orElse(null);
+    if (user != null) {
+      user.setPassword(passwordEncoder.encode("admin"));
+      userRepository.save(user);
+    }
   }
 
   public void createInsurancesAndPatients() {

@@ -16,6 +16,9 @@ import com.iagocharon.IGOF.Entity.UltrasoundDoctor;
 import com.iagocharon.IGOF.Entity.UltrasoundStudy;
 import com.iagocharon.IGOF.Entity.User;
 import com.iagocharon.IGOF.Jwt.JwtService;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +60,15 @@ public class AuthService {
   UltrasoundDoctorService ultrasoundDoctorService;
 
   public AuthResponse createPatient(PatientSignupRequest request) {
+    if (userService.existsByUsername(request.getUsername())) {
+      throw new IllegalArgumentException("Username already exists");
+    }
+    if (userService.existsByEmail(request.getEmail())) {
+      throw new IllegalArgumentException("Email already exists");
+    }
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+    LocalDate birthdate = LocalDate.parse(request.getBirthdate(), formatter);
+
     Patient user = new Patient();
     user.setUsername(request.getUsername().toLowerCase());
     user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -64,7 +76,7 @@ public class AuthService {
     user.setRole(Role.PATIENT);
     user.setName(request.getName());
     user.setLastname(request.getLastname());
-    user.setBirthdate(request.getBirthdate());
+    user.setBirthdate(birthdate);
     user.setPhone(request.getPhone());
     user.setAddress(request.getAddress());
     user.setCity(request.getCity());
@@ -100,34 +112,36 @@ public class AuthService {
     user.setName(request.getName());
     user.setLastname(request.getLastname());
     user.setAppointmentDuration(request.getAppointmentDuration());
-    List<Specialty> specialties = request
-      .getSpecialtyIds()
-      .stream()
-      .map(id ->
-        specialtyService
-          .getById(UUID.fromString(id))
-          .orElseThrow(() ->
-            new IllegalArgumentException("Specialty not found: " + id)
-          )
-      )
-      .toList();
-
+    List<Specialty> specialties = new ArrayList<>(
+      request
+        .getSpecialtyIds()
+        .stream()
+        .map(id ->
+          specialtyService
+            .getById(UUID.fromString(id))
+            .orElseThrow(() ->
+              new IllegalArgumentException("Specialty not found: " + id)
+            )
+        )
+        .toList()
+    );
     user.setSpecialties(specialties);
     final Doctor finalUser = user;
     specialties.forEach(specialty -> specialty.addDoctor(finalUser));
 
-    List<Insurance> insurances = request
-      .getInsurancesIds()
-      .stream()
-      .map(id ->
-        insuranceService
-          .getById(UUID.fromString(id))
-          .orElseThrow(() ->
-            new IllegalArgumentException("Insurance not found: " + id)
-          )
-      )
-      .toList();
-
+    List<Insurance> insurances = new ArrayList<>(
+      request
+        .getInsurancesIds()
+        .stream()
+        .map(id ->
+          insuranceService
+            .getById(UUID.fromString(id))
+            .orElseThrow(() ->
+              new IllegalArgumentException("Insurance not found: " + id)
+            )
+        )
+        .toList()
+    );
     user.setInsurances(insurances);
     insurances.forEach(insurance -> insurance.addDoctor(finalUser));
 
@@ -155,34 +169,36 @@ public class AuthService {
     user.setName(request.getName());
     user.setLastname(request.getLastname());
     user.setAppointmentDuration(request.getAppointmentDuration());
-    List<UltrasoundStudy> studies = request
-      .getUltrasoundStudiesIds()
-      .stream()
-      .map(id ->
-        ultrasoundStudyService
-          .getById(UUID.fromString(id))
-          .orElseThrow(() ->
-            new IllegalArgumentException("Ultrasound study not found: " + id)
-          )
-      )
-      .toList();
-
+    List<UltrasoundStudy> studies = new ArrayList<>(
+      request
+        .getUltrasoundStudiesIds()
+        .stream()
+        .map(id ->
+          ultrasoundStudyService
+            .getById(UUID.fromString(id))
+            .orElseThrow(() ->
+              new IllegalArgumentException("Ultrasound study not found: " + id)
+            )
+        )
+        .toList()
+    );
     user.setUltrasoundStudies(studies);
     final UltrasoundDoctor finalUser = user;
     studies.forEach(study -> study.addUltrasoundDoctor(finalUser));
 
-    List<Insurance> insurances = request
-      .getInsurancesIds()
-      .stream()
-      .map(id ->
-        insuranceService
-          .getById(UUID.fromString(id))
-          .orElseThrow(() ->
-            new IllegalArgumentException("Insurance not found: " + id)
-          )
-      )
-      .toList();
-
+    List<Insurance> insurances = new ArrayList<>(
+      request
+        .getInsurancesIds()
+        .stream()
+        .map(id ->
+          insuranceService
+            .getById(UUID.fromString(id))
+            .orElseThrow(() ->
+              new IllegalArgumentException("Insurance not found: " + id)
+            )
+        )
+        .toList()
+    );
     user.setInsurances(insurances);
     insurances.forEach(insurance -> insurance.addUltrasoundDoctor(finalUser));
 
@@ -219,15 +235,25 @@ public class AuthService {
   }
 
   public AuthResponse login(LoginRequest loginRequest) {
+    System.out.println(
+      "Login request: " +
+      loginRequest.getUsername() +
+      ", " +
+      loginRequest.getPassword()
+    );
     User user = userService
       .getByUsername(loginRequest.getUsername().toLowerCase())
       .get();
+
+    System.out.println("User found: " + user.getUsername());
     if (
       !passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())
     ) {
+      System.out.println("Invalid password");
       throw new BadCredentialsException("Invalid password");
     }
     var jwt = jwtService.generateToken(user);
+    System.out.println("JWT generated: " + jwt);
     return new AuthResponse(
       jwt,
       user.getId(),

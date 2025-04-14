@@ -2,6 +2,7 @@ package com.iagocharon.IGOF.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -26,7 +27,7 @@ public class Doctor extends User {
   @JsonIgnoreProperties("doctor")
   private List<Appointment> appointments;
 
-  @ManyToMany
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
     name = "doctor_specialties",
     joinColumns = @JoinColumn(name = "doctor_id"),

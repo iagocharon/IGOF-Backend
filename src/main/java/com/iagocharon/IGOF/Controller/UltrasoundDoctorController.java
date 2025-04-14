@@ -9,6 +9,7 @@ import com.iagocharon.IGOF.Service.AuthService;
 import com.iagocharon.IGOF.Service.InsuranceService;
 import com.iagocharon.IGOF.Service.UltrasoundDoctorService;
 import com.iagocharon.IGOF.Service.UltrasoundStudyService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,25 +107,42 @@ public class UltrasoundDoctorController {
     doctor.setEmail(request.getEmail());
     doctor.setName(request.getName());
     doctor.setLastname(request.getLastname());
-    List<UltrasoundStudy> studies = request
-      .getUltrasoundStudiesIds()
-      .stream()
-      .map(studyId ->
-        ultrasoundStudyService.getById(UUID.fromString(studyId)).get()
-      )
-      .toList();
+    List<UltrasoundStudy> studies = new ArrayList<>(
+      request
+        .getUltrasoundStudiesIds()
+        .stream()
+        .map(studyId ->
+          ultrasoundStudyService
+            .getById(UUID.fromString(studyId))
+            .orElseThrow(() ->
+              new IllegalArgumentException(
+                "Ultrasound study not found: " + studyId
+              )
+            )
+        )
+        .toList()
+    );
     doctor.setUltrasoundStudies(studies);
-
     final UltrasoundDoctor finalDoctor = doctor;
     studies.forEach(study -> study.addUltrasoundDoctor(finalDoctor));
 
-    List<Insurance> insurances = request
-      .getInsurancesIds()
-      .stream()
-      .map(insuranceId ->
-        insuranceService.getById(UUID.fromString(insuranceId)).get()
+    List<Insurance> insurances = request.getInsurancesIds() != null
+      ? new ArrayList<>(
+        request
+          .getInsurancesIds()
+          .stream()
+          .map(insuranceId ->
+            insuranceService
+              .getById(UUID.fromString(insuranceId))
+              .orElseThrow(() ->
+                new IllegalArgumentException(
+                  "Insurance not found: " + insuranceId
+                )
+              )
+          )
+          .toList()
       )
-      .toList();
+      : new ArrayList<>();
     doctor.setInsurances(insurances);
     insurances.forEach(insurance -> insurance.addUltrasoundDoctor(finalDoctor));
     doctor.setAppointmentDuration(request.getAppointmentDuration());

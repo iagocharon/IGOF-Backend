@@ -96,6 +96,8 @@ public class SecurityConfig {
           .permitAll()
           .requestMatchers(HttpMethod.GET, "/**")
           .permitAll()
+          .requestMatchers(HttpMethod.DELETE, "/**")
+          .permitAll()
           .requestMatchers(HttpMethod.PUT, "/**")
           .permitAll()
           .requestMatchers(HttpMethod.OPTIONS, "/**")
