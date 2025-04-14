@@ -1,5 +1,6 @@
 package com.iagocharon.IGOF.Controller;
 
+import com.iagocharon.IGOF.Dto.Message;
 import com.iagocharon.IGOF.Dto.Projections.UltrasoundDoctorProjection;
 import com.iagocharon.IGOF.Dto.UltrasoundDoctorSignupRequest;
 import com.iagocharon.IGOF.Entity.Insurance;
@@ -151,6 +152,6 @@ public class UltrasoundDoctorController {
     ultrasoundStudyService.saveAll(studies);
     insuranceService.saveAll(insurances);
 
-    return new ResponseEntity<>("Doctor updated.", HttpStatus.OK);
+    return new ResponseEntity<>(new Message("Doctor updated."), HttpStatus.OK);
   }
 }
