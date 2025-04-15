@@ -1,5 +1,12 @@
 package com.iagocharon.IGOF.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.iagocharon.IGOF.Dto.Projections.InsuranceProjection;
 import com.iagocharon.IGOF.Entity.Appointment;
 import com.iagocharon.IGOF.Entity.Doctor;
@@ -14,12 +21,8 @@ import com.iagocharon.IGOF.Repository.InsuranceRepository;
 import com.iagocharon.IGOF.Repository.PatientRepository;
 import com.iagocharon.IGOF.Repository.UltrasoundAppointmentRepository;
 import com.iagocharon.IGOF.Repository.UltrasoundDoctorRepository;
+
 import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
@@ -67,23 +70,31 @@ public class InsuranceService {
   }
 
   public void delete(Insurance insurance) {
-    for (Doctor doctor : insurance.getDoctors()) {
-      doctor.removeInsurance(insurance);
-      doctorRepository.save(doctor);
-    }
-    for (UltrasoundDoctor ultrasoundDoctor : insurance.getUltrasoundDoctors()) {
-      ultrasoundDoctor.removeInsurance(insurance);
-      ultrasoundDoctorRepository.save(ultrasoundDoctor);
+    if (insurance.getDoctors() != null) {
+      for (Doctor doctor : insurance.getDoctors()) {
+        doctor.removeInsurance(insurance);
+        doctorRepository.save(doctor);
+      }
     }
 
-    for (Appointment appointment : insurance.getAppointments()) {
-      appointment.setInsurance(null);
-      appointmentRepository.save(appointment);
+    if (insurance.getUltrasoundDoctors() != null) {
+      for (UltrasoundDoctor ultrasoundDoctor : insurance.getUltrasoundDoctors()) {
+        ultrasoundDoctor.removeInsurance(insurance);
+        ultrasoundDoctorRepository.save(ultrasoundDoctor);
+      }
     }
 
-    for (UltrasoundAppointment ultrasoundAppointment : insurance.getUltrasoundAppointments()) {
-      ultrasoundAppointment.setInsurance(null);
-      ultrasoundAppointmentRepository.save(ultrasoundAppointment);
+    if (insurance.getAppointments() != null) {
+      for (Appointment appointment : insurance.getAppointments()) {
+        appointment.setInsurance(null);
+        appointmentRepository.save(appointment);
+      }
+    }
+    if (insurance.getUltrasoundAppointments() != null) {
+      for (UltrasoundAppointment ultrasoundAppointment : insurance.getUltrasoundAppointments()) {
+        ultrasoundAppointment.setInsurance(null);
+        ultrasoundAppointmentRepository.save(ultrasoundAppointment);
+      }
     }
 
     InsuranceParent insuranceParent = insurance.getInsuranceParent();
@@ -97,23 +108,31 @@ public class InsuranceService {
 
   public void deleteById(UUID id) {
     Insurance insurance = insuranceRepository.findById(id).get();
-    for (Doctor doctor : insurance.getDoctors()) {
-      doctor.removeInsurance(insurance);
-      doctorRepository.save(doctor);
-    }
-    for (UltrasoundDoctor ultrasoundDoctor : insurance.getUltrasoundDoctors()) {
-      ultrasoundDoctor.removeInsurance(insurance);
-      ultrasoundDoctorRepository.save(ultrasoundDoctor);
+    if (insurance.getDoctors() != null) {
+      for (Doctor doctor : insurance.getDoctors()) {
+        doctor.removeInsurance(insurance);
+        doctorRepository.save(doctor);
+      }
     }
 
-    for (Appointment appointment : insurance.getAppointments()) {
-      appointment.setInsurance(null);
-      appointmentRepository.save(appointment);
+    if (insurance.getUltrasoundDoctors() != null) {
+      for (UltrasoundDoctor ultrasoundDoctor : insurance.getUltrasoundDoctors()) {
+        ultrasoundDoctor.removeInsurance(insurance);
+        ultrasoundDoctorRepository.save(ultrasoundDoctor);
+      }
     }
 
-    for (UltrasoundAppointment ultrasoundAppointment : insurance.getUltrasoundAppointments()) {
-      ultrasoundAppointment.setInsurance(null);
-      ultrasoundAppointmentRepository.save(ultrasoundAppointment);
+    if (insurance.getAppointments() != null) {
+      for (Appointment appointment : insurance.getAppointments()) {
+        appointment.setInsurance(null);
+        appointmentRepository.save(appointment);
+      }
+    }
+    if (insurance.getUltrasoundAppointments() != null) {
+      for (UltrasoundAppointment ultrasoundAppointment : insurance.getUltrasoundAppointments()) {
+        ultrasoundAppointment.setInsurance(null);
+        ultrasoundAppointmentRepository.save(ultrasoundAppointment);
+      }
     }
 
     InsuranceParent insuranceParent = insurance.getInsuranceParent();
@@ -121,7 +140,8 @@ public class InsuranceService {
       insuranceParent.removeInsurance(insurance);
       insuranceParentRepository.save(insuranceParent);
     }
-    insuranceRepository.deleteById(id);
+
+    insuranceRepository.delete(insurance);
   }
 
   public List<InsuranceProjection> getAll() {

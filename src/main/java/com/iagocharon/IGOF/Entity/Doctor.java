@@ -1,6 +1,10 @@
 package com.iagocharon.IGOF.Entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -8,22 +12,20 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "doctors")
 public class Doctor extends User {
 
-  @ManyToMany(mappedBy = "doctors")
+  @ManyToMany(mappedBy = "doctors", fetch = FetchType.EAGER)
   @JsonIgnoreProperties("doctors")
   private List<Insurance> insurances;
 
-  @OneToMany(mappedBy = "doctor")
+  @OneToMany(mappedBy = "doctor", fetch = FetchType.EAGER)
   @JsonIgnoreProperties("doctor")
   private List<WorkSchedule> workSchedules;
 
-  @OneToMany(mappedBy = "doctor")
+  @OneToMany(mappedBy = "doctor", fetch = FetchType.EAGER)
   @JsonIgnoreProperties("doctor")
   private List<Appointment> appointments;
 

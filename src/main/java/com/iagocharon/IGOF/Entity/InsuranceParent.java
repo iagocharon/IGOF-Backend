@@ -1,6 +1,11 @@
 package com.iagocharon.IGOF.Entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -8,12 +13,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Entity
-@Table(name = "insurance_parents")
+@Table(
+  name = "insurance_parents",
+  uniqueConstraints = {
+    @jakarta.persistence.UniqueConstraint(columnNames = { "name" }),
+  }
+)
 public class InsuranceParent {
 
   @Id
@@ -24,7 +31,7 @@ public class InsuranceParent {
 
   private int dailyLimit;
 
-  @OneToMany(mappedBy = "insuranceParent", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "insuranceParent", fetch = FetchType.EAGER)
   @JsonIgnoreProperties("insuranceParent")
   private List<Insurance> insurances;
 
@@ -67,11 +74,9 @@ public class InsuranceParent {
 
   public void addInsurance(Insurance insurance) {
     this.insurances.add(insurance);
-    insurance.setInsuranceParent(this);
   }
 
   public void removeInsurance(Insurance insurance) {
     this.insurances.remove(insurance);
-    insurance.setInsuranceParent(null);
   }
 }

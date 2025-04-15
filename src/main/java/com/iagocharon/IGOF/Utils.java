@@ -1,5 +1,20 @@
 package com.iagocharon.IGOF;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
 import com.iagocharon.IGOF.Entity.Doctor;
 import com.iagocharon.IGOF.Entity.Insurance;
 import com.iagocharon.IGOF.Entity.InsuranceParent;
@@ -24,17 +39,8 @@ import com.iagocharon.IGOF.Service.SpecialtyService;
 import com.iagocharon.IGOF.Service.UltrasoundDoctorService;
 import com.iagocharon.IGOF.Service.UltrasoundStudyService;
 import com.iagocharon.IGOF.Service.WorkScheduleService;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+
+import jakarta.transaction.Transactional;
 
 @Component
 public class Utils implements CommandLineRunner {
@@ -92,11 +98,51 @@ public class Utils implements CommandLineRunner {
     // createDoctors();
     // createUltrasoundDoctors();
 
+    //  ---------- UTILS ----------
+
+    // removeDuplicateInsurances();
+    // removeDuplicateInsuranceParents();
+
     Optional<User> admin = userRepository.findByUsername("admin");
     User user = admin.orElse(null);
     if (user != null) {
       user.setPassword(passwordEncoder.encode("admin"));
       userRepository.save(user);
+    }
+  }
+
+  @Transactional
+  public void removeDuplicateInsurances() {
+    List<Insurance> allInsurances = insuranceService.getAllInsurances();
+    Map<String, Insurance> uniqueInsurances = new HashMap<>();
+
+    // Identificar y eliminar duplicados
+    for (Insurance insurance : allInsurances) {
+      String name = insurance.getName();
+      if (!uniqueInsurances.containsKey(name)) {
+        uniqueInsurances.put(name, insurance);
+      } else {
+        // Primero eliminar todas las relaciones
+        insuranceService.deleteById(insurance.getId());
+      }
+    }
+  }
+
+  @Transactional
+  public void removeDuplicateInsuranceParents() {
+    List<InsuranceParent> allInsurances =
+      insuranceParentService.getAllInsuranceParents();
+    Map<String, InsuranceParent> uniqueInsurances = new HashMap<>();
+
+    // Identificar y eliminar duplicados
+    for (InsuranceParent insurance : allInsurances) {
+      String name = insurance.getName();
+      if (!uniqueInsurances.containsKey(name)) {
+        uniqueInsurances.put(name, insurance);
+      } else {
+        // Primero eliminar todas las relaciones
+        insuranceParentService.deleteById(insurance.getId());
+      }
     }
   }
 

@@ -1,6 +1,11 @@
 package com.iagocharon.IGOF.Entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,12 +18,14 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @Entity
-@Table(name = "insurances")
+@Table(
+  name = "insurances",
+  uniqueConstraints = {
+    @jakarta.persistence.UniqueConstraint(columnNames = { "name" }),
+  }
+)
 public class Insurance {
 
   @Id
@@ -56,7 +63,7 @@ public class Insurance {
 
   @OneToMany(
     mappedBy = "insurance",
-    fetch = FetchType.LAZY,
+    fetch = FetchType.EAGER,
     cascade = CascadeType.ALL
   )
   @JsonIgnoreProperties(
@@ -68,7 +75,7 @@ public class Insurance {
 
   @OneToMany(
     mappedBy = "insurance",
-    fetch = FetchType.LAZY,
+    fetch = FetchType.EAGER,
     cascade = CascadeType.ALL
   )
   @JsonIgnoreProperties(
