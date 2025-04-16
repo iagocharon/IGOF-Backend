@@ -78,4 +78,33 @@ public class UltrasoundDoctorSignupRequest {
   public void setInsurancesIds(List<String> insurancesIds) {
     this.insurancesIds = insurancesIds;
   }
+
+  @Override
+  public String toString() {
+    return (
+      "UltrasoundDoctorSignupRequest{" +
+      "username='" +
+      username +
+      '\'' +
+      ", password='" +
+      password +
+      '\'' +
+      ", email='" +
+      email +
+      '\'' +
+      ", name='" +
+      name +
+      '\'' +
+      ", lastname='" +
+      lastname +
+      '\'' +
+      ", ultrasoundStudiesIds=" +
+      ultrasoundStudiesIds +
+      ", appointmentDuration=" +
+      appointmentDuration +
+      ", insurancesIds=" +
+      insurancesIds +
+      '}'
+    );
+  }
 }

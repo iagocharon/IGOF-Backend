@@ -10,7 +10,6 @@ import com.iagocharon.IGOF.Service.AuthService;
 import com.iagocharon.IGOF.Service.DoctorService;
 import com.iagocharon.IGOF.Service.InsuranceService;
 import com.iagocharon.IGOF.Service.SpecialtyService;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +105,7 @@ public class DoctorController {
     @RequestParam String id,
     @RequestBody DoctorSignupRequest request
   ) {
+    System.out.println(request);
     if (!doctorService.existsById(UUID.fromString(id))) {
       return new ResponseEntity<>(
         new Message("No doctor found."),
@@ -117,54 +117,89 @@ public class DoctorController {
     doctor.setEmail(request.getEmail());
     doctor.setName(request.getName());
     doctor.setLastname(request.getLastname());
-    // Agregar verificación para specialtyIds
-    List<Specialty> specialties = request.getSpecialtyIds() != null
-      ? new ArrayList<>(
-        request
-          .getSpecialtyIds()
-          .stream()
-          .map(specialtyId ->
-            specialtyService
-              .getById(UUID.fromString(specialtyId))
-              .orElseThrow(() ->
-                new IllegalArgumentException(
-                  "Specialty not found: " + specialtyId
-                )
-              )
-          )
-          .toList()
-      ) // Envolver en new ArrayList<>()
-      : new ArrayList<>();
-    doctor.setSpecialties(specialties);
-
-    final Doctor finalDoctor = doctor;
-    specialties.forEach(specialty -> specialty.addDoctor(finalDoctor));
-    // Verificar también insurancesIds
-    List<Insurance> insurances = request.getInsurancesIds() != null
-      ? new ArrayList<>(
-        request
-          .getInsurancesIds()
-          .stream()
-          .map(insuranceId ->
-            insuranceService
-              .getById(UUID.fromString(insuranceId))
-              .orElseThrow(() ->
-                new IllegalArgumentException(
-                  "Insurance not found: " + insuranceId
-                )
-              )
-          )
-          .toList()
-      ) // Envolver en ArrayList mutable
-      : new ArrayList<>();
-    doctor.setInsurances(insurances);
-
-    insurances.forEach(insurance -> insurance.addDoctor(finalDoctor));
     doctor.setAppointmentDuration(request.getAppointmentDuration());
 
-    doctor = doctorService.save(doctor);
-    specialtyService.saveAll(specialties);
-    insuranceService.saveAll(insurances);
+    // Synchronize specialties: add new ones and remove missing ones.
+    if (request.getSpecialtyIds() != null) {
+      // Convert incoming specialty ids from String to UUID
+      List<UUID> incomingSpecialtyIds = request
+        .getSpecialtyIds()
+        .stream()
+        .map(UUID::fromString)
+        .toList();
+
+      // For each specialty id in the request, add if not already present.
+      for (String specialtyIdStr : request.getSpecialtyIds()) {
+        UUID specialtyId = UUID.fromString(specialtyIdStr);
+        if (!doctor.hasSpecialty(specialtyId)) {
+          Specialty specialty = specialtyService
+            .getById(specialtyId)
+            .orElseThrow(() ->
+              new IllegalArgumentException(
+                "Specialty not found: " + specialtyIdStr
+              )
+            );
+          doctor.addSpecialty(specialty);
+          specialty.addDoctor(doctor);
+          specialtyService.save(specialty);
+        }
+      }
+
+      // Remove any specialty from the doctor that is not present in the request.
+      doctor
+        .getSpecialties()
+        .removeIf(specialty -> {
+          if (!incomingSpecialtyIds.contains(specialty.getId())) {
+            specialty.removeDoctor(doctor);
+            specialtyService.save(specialty);
+            return true;
+          }
+          return false;
+        });
+      doctorService.save(doctor);
+    }
+
+    // Synchronize insurances: add new ones and remove missing ones.
+    if (request.getInsurancesIds() != null) {
+      // Convert incoming insurance ids from String to UUID
+      List<UUID> incomingInsurancesIds = request
+        .getInsurancesIds()
+        .stream()
+        .map(UUID::fromString)
+        .toList();
+
+      // For each insurance id in the request, add if not already present.
+      for (String insuranceIdStr : request.getInsurancesIds()) {
+        UUID insuranceId = UUID.fromString(insuranceIdStr);
+        if (!doctor.hasInsurance(insuranceId)) {
+          Insurance insurance = insuranceService
+            .getById(insuranceId)
+            .orElseThrow(() ->
+              new IllegalArgumentException(
+                "Insurance not found: " + insuranceIdStr
+              )
+            );
+          doctor.addInsurance(insurance);
+          insurance.addDoctor(doctor);
+          insuranceService.save(insurance);
+        }
+      }
+
+      // Remove any specialty from the doctor that is not present in the request.
+      doctor
+        .getInsurances()
+        .removeIf(insurance -> {
+          if (!incomingInsurancesIds.contains(insurance.getId())) {
+            insurance.removeDoctor(doctor);
+            insuranceService.save(insurance);
+            return true;
+          }
+          return false;
+        });
+      doctorService.save(doctor);
+    }
+
+    doctorService.save(doctor);
     return new ResponseEntity<>(
       new Message("Doctor updated successfully."),
       HttpStatus.OK

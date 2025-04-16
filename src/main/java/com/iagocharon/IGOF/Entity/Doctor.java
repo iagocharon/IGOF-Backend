@@ -1,10 +1,6 @@
 package com.iagocharon.IGOF.Entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -12,6 +8,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "doctors")
@@ -118,7 +117,17 @@ public class Doctor extends User {
     this.specialties.remove(specialty);
   }
 
+  public boolean hasSpecialty(UUID specialtyId) {
+    return this.specialties.stream()
+      .anyMatch(specialty -> specialty.getId().equals(specialtyId));
+  }
+
   public List<String> getSpecialtiesNames() {
     return this.specialties.stream().map(Specialty::getName).toList();
+  }
+
+  public boolean hasInsurance(UUID insuranceId) {
+    return this.insurances.stream()
+      .anyMatch(insurance -> insurance.getId().equals(insuranceId));
   }
 }

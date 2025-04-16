@@ -18,8 +18,6 @@ import com.iagocharon.IGOF.Entity.User;
 import com.iagocharon.IGOF.Jwt.JwtService;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -112,42 +110,49 @@ public class AuthService {
     user.setName(request.getName());
     user.setLastname(request.getLastname());
     user.setAppointmentDuration(request.getAppointmentDuration());
-    List<Specialty> specialties = new ArrayList<>(
-      request
-        .getSpecialtyIds()
-        .stream()
-        .map(id ->
-          specialtyService
-            .getById(UUID.fromString(id))
+    if (request.getSpecialtyIds() != null) {
+      // For each specialty id in the request, add if not already present.
+      for (String specialtyIdStr : request.getSpecialtyIds()) {
+        UUID specialtyId = UUID.fromString(specialtyIdStr);
+        if (!user.hasSpecialty(specialtyId)) {
+          Specialty specialty = specialtyService
+            .getById(specialtyId)
             .orElseThrow(() ->
-              new IllegalArgumentException("Specialty not found: " + id)
-            )
-        )
-        .toList()
-    );
-    user.setSpecialties(specialties);
-    final Doctor finalUser = user;
-    specialties.forEach(specialty -> specialty.addDoctor(finalUser));
+              new IllegalArgumentException(
+                "Specialty not found: " + specialtyIdStr
+              )
+            );
+          user.addSpecialty(specialty);
+          specialty.addDoctor(user);
+          specialtyService.save(specialty);
+        }
+      }
 
-    List<Insurance> insurances = new ArrayList<>(
-      request
-        .getInsurancesIds()
-        .stream()
-        .map(id ->
-          insuranceService
-            .getById(UUID.fromString(id))
+      doctorService.save(user);
+    }
+
+    if (request.getInsurancesIds() != null) {
+      // For each insurance id in the request, add if not already present.
+      for (String insuranceIdStr : request.getInsurancesIds()) {
+        UUID insuranceId = UUID.fromString(insuranceIdStr);
+        if (!user.hasInsurance(insuranceId)) {
+          Insurance insurance = insuranceService
+            .getById(insuranceId)
             .orElseThrow(() ->
-              new IllegalArgumentException("Insurance not found: " + id)
-            )
-        )
-        .toList()
-    );
-    user.setInsurances(insurances);
-    insurances.forEach(insurance -> insurance.addDoctor(finalUser));
+              new IllegalArgumentException(
+                "Insurance not found: " + insuranceIdStr
+              )
+            );
+          user.addInsurance(insurance);
+          insurance.addDoctor(user);
+          insuranceService.save(insurance);
+        }
+      }
+
+      doctorService.save(user);
+    }
 
     user = doctorService.save(user);
-    specialtyService.saveAll(specialties);
-    insuranceService.saveAll(insurances);
 
     var jwt = jwtService.generateToken(user);
     return new AuthResponse(
@@ -169,43 +174,49 @@ public class AuthService {
     user.setName(request.getName());
     user.setLastname(request.getLastname());
     user.setAppointmentDuration(request.getAppointmentDuration());
-    List<UltrasoundStudy> studies = new ArrayList<>(
-      request
-        .getUltrasoundStudiesIds()
-        .stream()
-        .map(id ->
-          ultrasoundStudyService
-            .getById(UUID.fromString(id))
+    if (request.getUltrasoundStudiesIds() != null) {
+      // For each ultrasoundStudy id in the request, add if not already present.
+      for (String ultrasoundStudyIdStr : request.getUltrasoundStudiesIds()) {
+        UUID ultrasoundStudyId = UUID.fromString(ultrasoundStudyIdStr);
+        if (!user.hasUltrasoundStudy(ultrasoundStudyId)) {
+          UltrasoundStudy ultrasoundStudy = ultrasoundStudyService
+            .getById(ultrasoundStudyId)
             .orElseThrow(() ->
-              new IllegalArgumentException("Ultrasound study not found: " + id)
-            )
-        )
-        .toList()
-    );
-    user.setUltrasoundStudies(studies);
-    final UltrasoundDoctor finalUser = user;
-    studies.forEach(study -> study.addUltrasoundDoctor(finalUser));
+              new IllegalArgumentException(
+                "Study not found: " + ultrasoundStudyIdStr
+              )
+            );
+          user.addUltrasoundStudy(ultrasoundStudy);
+          ultrasoundStudy.addUltrasoundDoctor(user);
+          ultrasoundStudyService.save(ultrasoundStudy);
+        }
+      }
 
-    List<Insurance> insurances = new ArrayList<>(
-      request
-        .getInsurancesIds()
-        .stream()
-        .map(id ->
-          insuranceService
-            .getById(UUID.fromString(id))
+      ultrasoundDoctorService.save(user);
+    }
+
+    if (request.getInsurancesIds() != null) {
+      // For each specialty id in the request, add if not already present.
+      for (String insuranceIdStr : request.getInsurancesIds()) {
+        UUID insuranceId = UUID.fromString(insuranceIdStr);
+        if (!user.hasInsurance(insuranceId)) {
+          Insurance insurance = insuranceService
+            .getById(insuranceId)
             .orElseThrow(() ->
-              new IllegalArgumentException("Insurance not found: " + id)
-            )
-        )
-        .toList()
-    );
-    user.setInsurances(insurances);
-    insurances.forEach(insurance -> insurance.addUltrasoundDoctor(finalUser));
+              new IllegalArgumentException(
+                "Insurance not found: " + insuranceIdStr
+              )
+            );
+          user.addInsurance(insurance);
+          insurance.addUltrasoundDoctor(user);
+          insuranceService.save(insurance);
+        }
+      }
+
+      ultrasoundDoctorService.save(user);
+    }
 
     user = ultrasoundDoctorService.save(user);
-    ultrasoundStudyService.saveAll(studies);
-    insuranceService.saveAll(insurances);
-
     var jwt = jwtService.generateToken(user);
     return new AuthResponse(
       jwt,

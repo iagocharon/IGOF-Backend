@@ -14,17 +14,9 @@ public interface AppointmentProjection {
 
   public UUID getDoctorId();
 
-  public UUID getPatientId();
+  public PatientProjection getPatient();
 
-  public String getPatientName();
-
-  public String getPatientLastname();
-
-  public UUID getInsuranceId();
-
-  public int getInsuranceDailyLimit();
-
-  public String getAppointmentStatusString();
+  public InsuranceProjection getInsurance();
 
   public double getPlus();
 

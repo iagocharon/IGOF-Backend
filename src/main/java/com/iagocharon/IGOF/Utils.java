@@ -1,20 +1,5 @@
 package com.iagocharon.IGOF;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-
 import com.iagocharon.IGOF.Entity.Doctor;
 import com.iagocharon.IGOF.Entity.Insurance;
 import com.iagocharon.IGOF.Entity.InsuranceParent;
@@ -39,8 +24,20 @@ import com.iagocharon.IGOF.Service.SpecialtyService;
 import com.iagocharon.IGOF.Service.UltrasoundDoctorService;
 import com.iagocharon.IGOF.Service.UltrasoundStudyService;
 import com.iagocharon.IGOF.Service.WorkScheduleService;
-
 import jakarta.transaction.Transactional;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
 @Component
 public class Utils implements CommandLineRunner {
@@ -88,13 +85,7 @@ public class Utils implements CommandLineRunner {
   public void run(String... args) {
     // createInsurancesAndPatients();
     // createPaymentMethods();
-    // createAdmin(
-    //   "adminIGOF",
-    //   "Admin@2025",
-    //   "admins@igof.com.ar",
-    //   "Admins",
-    //   "IGOF"
-    // );
+    // createAdmin("admin", "admin", "a@igof.com.ar", "Admins", "IGOF");
     // createDoctors();
     // createUltrasoundDoctors();
 
@@ -102,6 +93,9 @@ public class Utils implements CommandLineRunner {
 
     // removeDuplicateInsurances();
     // removeDuplicateInsuranceParents();
+    // deleteAllInsurances();
+
+    // createConsalud();
 
     Optional<User> admin = userRepository.findByUsername("admin");
     User user = admin.orElse(null);
@@ -109,6 +103,20 @@ public class Utils implements CommandLineRunner {
       user.setPassword(passwordEncoder.encode("admin"));
       userRepository.save(user);
     }
+  }
+
+  public void deleteAllInsurances() {
+    List<Insurance> allInsurances = insuranceService.getAllInsurances();
+    for (Insurance insurance : allInsurances) {
+      insuranceService.deleteById(insurance.getId());
+    }
+
+    List<InsuranceParent> allInsuranceParents =
+      insuranceParentService.getAllInsuranceParents();
+    for (InsuranceParent insuranceParent : allInsuranceParents) {
+      insuranceParentService.deleteById(insuranceParent.getId());
+    }
+    // createInsurancesAndPatients();
   }
 
   @Transactional
@@ -143,6 +151,33 @@ public class Utils implements CommandLineRunner {
         // Primero eliminar todas las relaciones
         insuranceParentService.deleteById(insurance.getId());
       }
+    }
+  }
+
+  public void createConsalud() {
+    List<String> insurances = Arrays.asList(
+      "Luz y Fuerza - Consalud",
+      "Osa - Consalud",
+      "Osmata - Consalud",
+      "Ospaca - Consalud",
+      "Ospat - Consalud",
+      "Ospegap - Consalud",
+      "Ospreme - Consalud",
+      "Osptv - Consalud",
+      "Particulares - Consalud"
+    );
+
+    InsuranceParent insuranceParent = new InsuranceParent();
+    insuranceParent.setName("Consalud");
+    insuranceParent = insuranceParentService.save(insuranceParent);
+
+    for (String insuranceName : insurances) {
+      Insurance insurance = new Insurance();
+      insurance.setName(insuranceName);
+      insurance.setInsuranceParent(insuranceParent);
+      insurance = insuranceService.save(insurance);
+      insuranceParent.addInsurance(insurance);
+      insuranceParentService.save(insuranceParent);
     }
   }
 

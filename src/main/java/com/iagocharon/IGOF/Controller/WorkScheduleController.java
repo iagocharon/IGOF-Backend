@@ -214,36 +214,109 @@ public class WorkScheduleController {
     LocalDate endDate = LocalDate.parse(to, formatter);
     LocalTime startTime = LocalTime.parse(start, formatter);
     LocalTime endTime = LocalTime.parse(end, formatter);
+    UUID uuidDoctor = UUID.fromString(doctorId);
 
-    if (!doctorService.existsById(UUID.fromString(doctorId))) {
-      return new ResponseEntity<>(
-        new Message("Doctor not found."),
-        HttpStatus.NOT_FOUND
-      );
-    }
+    // Check if the doctor exists either as a Doctor or an UltrasoundDoctor
+    if (!doctorService.existsById(uuidDoctor)) {
+      if (!ultrasoundDoctorService.existsById(uuidDoctor)) {
+        return new ResponseEntity<>(
+          new Message("Doctor not found."),
+          HttpStatus.NOT_FOUND
+        );
+      }
+      // UltrasoundDoctor branch
+      UltrasoundDoctor doctor = ultrasoundDoctorService
+        .getById(uuidDoctor)
+        .orElse(null);
+      if (doctor == null) {
+        return new ResponseEntity<>(
+          new Message("Doctor not found."),
+          HttpStatus.NOT_FOUND
+        );
+      }
 
-    Doctor doctor = doctorService
-      .getById(UUID.fromString(doctorId))
-      .orElse(null);
-    if (doctor == null) {
-      return new ResponseEntity<>(
-        new Message("Doctor not found."),
-        HttpStatus.NOT_FOUND
-      );
-    }
+      for (
+        LocalDate date = startDate;
+        !date.isAfter(endDate);
+        date = date.plusDays(1)
+      ) {
+        if (dayOfWeek == null || date.getDayOfWeek() == dayOfWeek) {
+          // Check for any schedule conflict
+          List<WorkSchedule> schedules =
+            workScheduleService.findByUltrasoundDoctorIdAndDate(
+              uuidDoctor,
+              date
+            );
+          for (WorkSchedule schedule : schedules) {
+            if (
+              (schedule.getStart().isBefore(startTime) &&
+                schedule.getEnd().isAfter(endTime)) ||
+              (schedule.getStart().isAfter(startTime) &&
+                schedule.getStart().isBefore(endTime)) ||
+              (schedule.getEnd().isAfter(startTime) &&
+                schedule.getEnd().isBefore(endTime)) ||
+              schedule.getStart().equals(startTime) ||
+              schedule.getEnd().equals(endTime)
+            ) {
+              return new ResponseEntity<>(
+                new Message("Schedule conflict detected on " + date.toString()),
+                HttpStatus.CONFLICT
+              );
+            }
+          }
 
-    for (
-      LocalDate date = startDate;
-      !date.isAfter(endDate);
-      date = date.plusDays(1)
-    ) {
-      if (dayOfWeek == null || date.getDayOfWeek() == dayOfWeek) {
-        WorkSchedule newSchedule = new WorkSchedule();
-        newSchedule.setDate(date);
-        newSchedule.setStart(startTime);
-        newSchedule.setEnd(endTime);
-        newSchedule.setDoctor(doctor);
-        workScheduleService.save(newSchedule);
+          WorkSchedule newSchedule = new WorkSchedule();
+          newSchedule.setDate(date);
+          newSchedule.setStart(startTime);
+          newSchedule.setEnd(endTime);
+          newSchedule.setUltrasoundDoctor(doctor);
+          workScheduleService.save(newSchedule);
+        }
+      }
+    } else {
+      // Doctor branch
+      Doctor doctor = doctorService.getById(uuidDoctor).orElse(null);
+      if (doctor == null) {
+        return new ResponseEntity<>(
+          new Message("Doctor not found."),
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      for (
+        LocalDate date = startDate;
+        !date.isAfter(endDate);
+        date = date.plusDays(1)
+      ) {
+        if (dayOfWeek == null || date.getDayOfWeek() == dayOfWeek) {
+          // Check for any schedule conflict
+          List<WorkSchedule> schedules =
+            workScheduleService.findByDoctorIdAndDate(uuidDoctor, date);
+          for (WorkSchedule schedule : schedules) {
+            if (
+              (schedule.getStart().isBefore(startTime) &&
+                schedule.getEnd().isAfter(endTime)) ||
+              (schedule.getStart().isAfter(startTime) &&
+                schedule.getStart().isBefore(endTime)) ||
+              (schedule.getEnd().isAfter(startTime) &&
+                schedule.getEnd().isBefore(endTime)) ||
+              schedule.getStart().equals(startTime) ||
+              schedule.getEnd().equals(endTime)
+            ) {
+              return new ResponseEntity<>(
+                new Message("Schedule conflict detected on " + date.toString()),
+                HttpStatus.CONFLICT
+              );
+            }
+          }
+
+          WorkSchedule newSchedule = new WorkSchedule();
+          newSchedule.setDate(date);
+          newSchedule.setStart(startTime);
+          newSchedule.setEnd(endTime);
+          newSchedule.setDoctor(doctor);
+          workScheduleService.save(newSchedule);
+        }
       }
     }
 
@@ -255,7 +328,7 @@ public class WorkScheduleController {
 
   @PostMapping("/interval")
   public ResponseEntity<?> createWorkSchedulesInInterval(
-    @RequestParam UUID doctorId,
+    @RequestParam String doctorId,
     @RequestParam @DateTimeFormat(
       iso = DateTimeFormat.ISO.DATE
     ) LocalDate startDate,
@@ -265,25 +338,38 @@ public class WorkScheduleController {
     @RequestParam DayOfWeek dayOfWeek,
     @RequestBody WorkScheduleDto workScheduleDto
   ) {
-    if (!doctorService.existsById(doctorId)) {
-      return new ResponseEntity<>(
-        new Message("Doctor not found."),
-        HttpStatus.NOT_FOUND
-      );
-    }
-
-    Doctor doctor = doctorService.getById(doctorId).orElse(null);
-    if (doctor == null) {
-      return new ResponseEntity<>(
-        new Message("Doctor not found."),
-        HttpStatus.NOT_FOUND
-      );
-    }
-
+    UUID uuidDoctor = UUID.fromString(doctorId);
     WorkSchedule workScheduleTemplate = new WorkSchedule();
     workScheduleTemplate.setStart(LocalTime.parse(workScheduleDto.getStart()));
     workScheduleTemplate.setEnd(LocalTime.parse(workScheduleDto.getEnd()));
-    workScheduleTemplate.setDoctor(doctor);
+
+    // Determine if the provided id belongs to a Doctor or an UltrasoundDoctor
+    if (doctorService.existsById(uuidDoctor)) {
+      Doctor doctor = doctorService.getById(uuidDoctor).orElse(null);
+      if (doctor == null) {
+        return new ResponseEntity<>(
+          new Message("Doctor not found."),
+          HttpStatus.NOT_FOUND
+        );
+      }
+      workScheduleTemplate.setDoctor(doctor);
+    } else if (ultrasoundDoctorService.existsById(uuidDoctor)) {
+      UltrasoundDoctor ultrasoundDoctor = ultrasoundDoctorService
+        .getById(uuidDoctor)
+        .orElse(null);
+      if (ultrasoundDoctor == null) {
+        return new ResponseEntity<>(
+          new Message("Doctor not found."),
+          HttpStatus.NOT_FOUND
+        );
+      }
+      workScheduleTemplate.setUltrasoundDoctor(ultrasoundDoctor);
+    } else {
+      return new ResponseEntity<>(
+        new Message("Doctor not found."),
+        HttpStatus.NOT_FOUND
+      );
+    }
 
     List<WorkSchedule> schedules =
       workScheduleService.createSchedulesInInterval(
@@ -297,20 +383,28 @@ public class WorkScheduleController {
 
   @DeleteMapping(value = "delete")
   public ResponseEntity<?> delete(@RequestParam String id) {
-    if (!workScheduleService.existsById(UUID.fromString(id))) {
+    UUID scheduleId = UUID.fromString(id);
+    if (!workScheduleService.existsById(scheduleId)) {
       return new ResponseEntity<>(
         new Message("No work schedule found."),
         HttpStatus.NOT_FOUND
       );
     }
     WorkSchedule workSchedule = workScheduleService
-      .getById(UUID.fromString(id))
+      .getById(scheduleId)
       .orElse(null);
 
+    if (workSchedule == null) {
+      return new ResponseEntity<>(
+        new Message("No work schedule found."),
+        HttpStatus.NOT_FOUND
+      );
+    }
+
+    // If the schedule is for a standard doctor, cancel corresponding appointments
     if (workSchedule.getDoctor() != null) {
       Doctor doctor = workSchedule.getDoctor();
       ZoneId zone = ZoneId.of("America/Argentina/Buenos_Aires");
-
       ZonedDateTime start = ZonedDateTime.of(
         workSchedule.getDate(),
         workSchedule.getStart(),
@@ -327,36 +421,36 @@ public class WorkScheduleController {
           start,
           end
         );
-
       for (AppointmentProjection appointmentProjection : appointments) {
         Appointment appointment = appointmentService
           .getById(appointmentProjection.getId())
           .orElse(null);
-        appointment.setStatus(AppointmentStatus.CANCELLED);
-        appointmentService.save(appointment);
-
-        emailService.cancelReminder(appointment.getId());
-
-        emailService.sendNewMail(
-          appointment.getPatient().getEmail(),
-          "Turno cancelado",
-          "Hola " +
-          appointment.getPatient().getName() +
-          ", te informamos que tu turno con el Dr. " +
-          appointment.getDoctor().getLastname() +
-          ", " +
-          appointment.getDoctor().getName() +
-          " para el " +
-          appointment.getStart().toLocalDate() +
-          " a las " +
-          appointment.getStart().toLocalTime() +
-          " ha sido cancelado."
-        );
+        if (appointment != null) {
+          appointment.setStatus(AppointmentStatus.CANCELLED);
+          appointmentService.save(appointment);
+          emailService.cancelReminder(appointment.getId());
+          emailService.sendNewMail(
+            appointment.getPatient().getEmail(),
+            "Turno cancelado",
+            "Hola " +
+            appointment.getPatient().getName() +
+            ", te informamos que tu turno con el Dr. " +
+            appointment.getDoctor().getLastname() +
+            ", " +
+            appointment.getDoctor().getName() +
+            " para el " +
+            appointment.getStart().toLocalDate() +
+            " a las " +
+            appointment.getStart().toLocalTime() +
+            " ha sido cancelado."
+          );
+        }
       }
-    } else if (workSchedule.getUltrasoundDoctor() != null) {
+    }
+    // Else if the schedule is for an ultrasound doctor, cancel corresponding ultrasound appointments
+    else if (workSchedule.getUltrasoundDoctor() != null) {
       UltrasoundDoctor doctor = workSchedule.getUltrasoundDoctor();
       ZoneId zone = ZoneId.of("America/Argentina/Buenos_Aires");
-
       ZonedDateTime start = ZonedDateTime.of(
         workSchedule.getDate(),
         workSchedule.getStart(),
@@ -373,35 +467,34 @@ public class WorkScheduleController {
           start,
           end
         );
-
       for (UltrasoundAppointmentProjection appointmentProjection : appointments) {
         UltrasoundAppointment appointment = ultrasoundAppointmentService
           .getById(appointmentProjection.getId())
           .orElse(null);
-        appointment.setStatus(AppointmentStatus.CANCELLED);
-        ultrasoundAppointmentService.save(appointment);
-
-        emailService.cancelReminder(appointment.getId());
-
-        emailService.sendNewMail(
-          appointment.getPatient().getEmail(),
-          "Turno cancelado",
-          "Hola " +
-          appointment.getPatient().getName() +
-          ", te informamos que tu turno con el Dr. " +
-          appointment.getUltrasoundDoctor().getLastname() +
-          ", " +
-          appointment.getUltrasoundDoctor().getName() +
-          " para el " +
-          appointment.getStart().toLocalDate() +
-          " a las " +
-          appointment.getStart().toLocalTime() +
-          " ha sido cancelado."
-        );
+        if (appointment != null) {
+          appointment.setStatus(AppointmentStatus.CANCELLED);
+          ultrasoundAppointmentService.save(appointment);
+          emailService.cancelReminder(appointment.getId());
+          emailService.sendNewMail(
+            appointment.getPatient().getEmail(),
+            "Turno cancelado",
+            "Hola " +
+            appointment.getPatient().getName() +
+            ", te informamos que tu turno con el Dr. " +
+            appointment.getUltrasoundDoctor().getLastname() +
+            ", " +
+            appointment.getUltrasoundDoctor().getName() +
+            " para el " +
+            appointment.getStart().toLocalDate() +
+            " a las " +
+            appointment.getStart().toLocalTime() +
+            " ha sido cancelado."
+          );
+        }
       }
     }
 
-    workScheduleService.deleteById(UUID.fromString(id));
+    workScheduleService.deleteById(scheduleId);
     return new ResponseEntity<>(
       new Message("Work schedule deleted."),
       HttpStatus.OK

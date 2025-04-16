@@ -1,8 +1,10 @@
 package com.iagocharon.IGOF.Service;
 
 import com.iagocharon.IGOF.Entity.Doctor;
+import com.iagocharon.IGOF.Entity.UltrasoundDoctor;
 import com.iagocharon.IGOF.Entity.WorkSchedule;
 import com.iagocharon.IGOF.Repository.DoctorRepository;
+import com.iagocharon.IGOF.Repository.UltrasoundDoctorRepository;
 import com.iagocharon.IGOF.Repository.WorkScheduleRepository;
 import jakarta.transaction.Transactional;
 import java.time.DayOfWeek;
@@ -24,6 +26,9 @@ public class WorkScheduleService {
   @Autowired
   private DoctorRepository doctorRepository;
 
+  @Autowired
+  private UltrasoundDoctorRepository ultrasoundDoctorRepository;
+
   public WorkSchedule save(WorkSchedule workSchedule) {
     return workScheduleRepository.save(workSchedule);
   }
@@ -37,14 +42,34 @@ public class WorkScheduleService {
   }
 
   public void delete(WorkSchedule workSchedule) {
+    Doctor doctor = workSchedule.getDoctor();
+    if (doctor != null) {
+      doctor.removeWorkSchedule(workSchedule);
+      doctorRepository.save(doctor);
+    } else {
+      UltrasoundDoctor ultrasoundDoctor = workSchedule.getUltrasoundDoctor();
+      if (ultrasoundDoctor != null) {
+        ultrasoundDoctor.removeWorkSchedule(workSchedule);
+        ultrasoundDoctorRepository.save(ultrasoundDoctor);
+      }
+    }
+
     workScheduleRepository.delete(workSchedule);
   }
 
   public void deleteById(UUID id) {
     WorkSchedule workSchedule = workScheduleRepository.findById(id).get();
     Doctor doctor = workSchedule.getDoctor();
-    doctor.removeWorkSchedule(workSchedule);
-    doctorRepository.save(doctor);
+    if (doctor != null) {
+      doctor.removeWorkSchedule(workSchedule);
+      doctorRepository.save(doctor);
+    } else {
+      UltrasoundDoctor ultrasoundDoctor = workSchedule.getUltrasoundDoctor();
+      if (ultrasoundDoctor != null) {
+        ultrasoundDoctor.removeWorkSchedule(workSchedule);
+        ultrasoundDoctorRepository.save(ultrasoundDoctor);
+      }
+    }
     workScheduleRepository.deleteById(id);
   }
 

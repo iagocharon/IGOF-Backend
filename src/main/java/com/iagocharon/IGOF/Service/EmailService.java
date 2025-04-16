@@ -35,7 +35,14 @@ public class EmailService {
     message.setTo(to);
     message.setSubject(subject);
     message.setText(body);
-    mailSender.send(message);
+    ScheduledFuture<?> scheduledTask = taskScheduler.schedule(
+      () -> {
+        mailSender.send(message);
+      },
+      ZonedDateTime.now().toInstant()
+    );
+
+    scheduledReminders.put(UUID.randomUUID(), scheduledTask);
   }
 
   public void scheduleReminder(Appointment appointment) {

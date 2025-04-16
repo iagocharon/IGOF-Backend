@@ -12,6 +12,7 @@ import com.iagocharon.IGOF.Entity.Doctor;
 import com.iagocharon.IGOF.Entity.Evolution;
 import com.iagocharon.IGOF.Entity.MedicalRecord;
 import com.iagocharon.IGOF.Entity.Patient;
+import com.iagocharon.IGOF.Entity.Role;
 import com.iagocharon.IGOF.Entity.UltrasoundAppointment;
 import com.iagocharon.IGOF.Entity.UltrasoundDoctor;
 import com.iagocharon.IGOF.Entity.UltrasoundStudyReport;
@@ -130,6 +131,7 @@ public class PatientController {
     patient.setCountry(patientDto.getCountry());
     patient.setCitizenship(patientDto.getCitizenship());
     patient.setInsurance(patientDto.getInsurance());
+    patient.setRole(Role.PATIENT);
 
     patientService.save(patient);
 

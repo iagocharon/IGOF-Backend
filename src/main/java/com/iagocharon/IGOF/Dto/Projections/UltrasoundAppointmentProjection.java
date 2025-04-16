@@ -14,11 +14,9 @@ public interface UltrasoundAppointmentProjection {
 
   public UUID getUltrasoundDoctorId();
 
-  public UUID getPatientId();
+  public PatientProjection getPatient();
 
-  public UUID getInsuranceId();
-
-  public int getInsuranceDailyLimit();
+  public InsuranceProjection getInsurance();
 
   public double getPlus();
 

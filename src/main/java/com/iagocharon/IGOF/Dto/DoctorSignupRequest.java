@@ -86,4 +86,33 @@ public class DoctorSignupRequest {
   public void setInsurancesIds(List<String> insurancesIds) {
     this.insurancesIds = insurancesIds;
   }
+
+  @Override
+  public String toString() {
+    return (
+      "DoctorSignupRequest{" +
+      "username='" +
+      username +
+      '\'' +
+      ", password='" +
+      password +
+      '\'' +
+      ", email='" +
+      email +
+      '\'' +
+      ", name='" +
+      name +
+      '\'' +
+      ", lastname='" +
+      lastname +
+      '\'' +
+      ", specialtiesIds=" +
+      specialtiesIds +
+      ", appointmentDuration=" +
+      appointmentDuration +
+      ", insurancesIds=" +
+      insurancesIds +
+      '}'
+    );
+  }
 }

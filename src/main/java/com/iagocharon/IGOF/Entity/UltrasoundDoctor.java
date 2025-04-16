@@ -1,15 +1,14 @@
 package com.iagocharon.IGOF.Entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "ultrasound_doctors")
@@ -123,5 +122,19 @@ public class UltrasoundDoctor extends User {
 
   public void removeWorkSchedule(WorkSchedule workSchedule) {
     this.workSchedules.remove(workSchedule);
+  }
+
+  public boolean hasInsurance(UUID insuranceId) {
+    return insurances
+      .stream()
+      .anyMatch(insurance -> insurance.getId().equals(insuranceId));
+  }
+
+  public boolean hasUltrasoundStudy(UUID ultrasoundStudyId) {
+    return ultrasoundStudies
+      .stream()
+      .anyMatch(ultrasoundStudy ->
+        ultrasoundStudy.getId().equals(ultrasoundStudyId)
+      );
   }
 }
