@@ -65,7 +65,8 @@ public class AuthController {
     String token = UUID.randomUUID().toString();
     userService.savePasswordResetToken(user, token);
 
-    String resetLink = "https://igof.com.ar/#/password-form?token=" + token;
+    String resetLink =
+      "https://pacientes.igof.com.ar/#/password-form?token=" + token;
 
     String message =
       "Hola " +

@@ -24,6 +24,12 @@ public class EmailService {
     new HashMap<>();
 
   @Autowired
+  private AppointmentService appointmentService;
+
+  @Autowired
+  private UltrasoundAppointmentService ultrasoundAppointmentService;
+
+  @Autowired
   public EmailService(JavaMailSender mailSender, TaskScheduler taskScheduler) {
     this.mailSender = mailSender;
     this.taskScheduler = taskScheduler;
@@ -65,6 +71,8 @@ public class EmailService {
           " a las " +
           appointment.getStart().toLocalTime()
         );
+        appointment.setReminded(true);
+        appointmentService.save(appointment);
       },
       instant
     );
@@ -92,6 +100,8 @@ public class EmailService {
           " a las " +
           appointment.getStart().toLocalTime()
         );
+        appointment.setReminded(true);
+        ultrasoundAppointmentService.save(appointment);
       },
       instant
     );

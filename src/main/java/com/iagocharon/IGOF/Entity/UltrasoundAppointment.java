@@ -64,6 +64,10 @@ public class UltrasoundAppointment {
   @JsonIgnoreProperties("ultrasoundAppointment")
   List<UltrasoundStudyStatus> ultrasoundStudyStatuses;
 
+  private ZonedDateTime arrival;
+
+  private boolean reminded = false;
+
   public UltrasoundAppointment() {
     this.status = AppointmentStatus.INCOMPLETE;
     this.ultrasoundStudyStatuses = new ArrayList<>();
@@ -201,5 +205,21 @@ public class UltrasoundAppointment {
 
   public String getInsuranceName() {
     return insurance.getName();
+  }
+
+  public ZonedDateTime getArrival() {
+    return this.arrival;
+  }
+
+  public void setArrival(ZonedDateTime arrival) {
+    this.arrival = arrival;
+  }
+
+  public boolean isReminded() {
+    return reminded;
+  }
+
+  public void setReminded(boolean reminded) {
+    this.reminded = reminded;
   }
 }

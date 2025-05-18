@@ -112,15 +112,8 @@ public class WorkScheduleController {
       List<WorkSchedule> schedules =
         workScheduleService.findByUltrasoundDoctorIdAndDate(doctorId, date);
 
+      // Eliminar los horarios en conflicto
       for (WorkSchedule schedule : schedules) {
-        System.out.println("Schedule: ");
-        System.out.println(schedule.getStart());
-        System.out.println(schedule.getEnd());
-        System.out.println("New Schedule: ");
-        System.out.println(start);
-        System.out.println(end);
-        System.out.println("------");
-
         if (
           (schedule.getStart().isBefore(start) &&
             schedule.getEnd().isAfter(end)) ||
@@ -131,10 +124,7 @@ public class WorkScheduleController {
           schedule.getStart().equals(start) ||
           schedule.getEnd().equals(end)
         ) {
-          return new ResponseEntity<>(
-            new Message("Schedule conflict detected."),
-            HttpStatus.CONFLICT
-          );
+          workScheduleService.delete(schedule);
         }
       }
 
@@ -147,7 +137,7 @@ public class WorkScheduleController {
       newSchedule.setEnd(end);
       newSchedule.setUltrasoundDoctor(doctor);
 
-      WorkSchedule savedSchedule = workScheduleService.save(newSchedule);
+      workScheduleService.save(newSchedule);
 
       return new ResponseEntity<>(
         new Message("WorkSchedules created successfully."),
@@ -159,14 +149,8 @@ public class WorkScheduleController {
         date
       );
 
+      // Eliminar los horarios en conflicto
       for (WorkSchedule schedule : schedules) {
-        System.out.println("Schedule: ");
-        System.out.println(schedule.getStart());
-        System.out.println(schedule.getEnd());
-        System.out.println("New Schedule: ");
-        System.out.println(start);
-        System.out.println(end);
-        System.out.println("------");
         if (
           (schedule.getStart().isBefore(start) &&
             schedule.getEnd().isAfter(end)) ||
@@ -177,10 +161,7 @@ public class WorkScheduleController {
           schedule.getStart().equals(start) ||
           schedule.getEnd().equals(end)
         ) {
-          return new ResponseEntity<>(
-            new Message("Schedule conflict detected."),
-            HttpStatus.CONFLICT
-          );
+          workScheduleService.delete(schedule);
         }
       }
 
@@ -191,7 +172,7 @@ public class WorkScheduleController {
       newSchedule.setEnd(end);
       newSchedule.setDoctor(doctor);
 
-      WorkSchedule savedSchedule = workScheduleService.save(newSchedule);
+      workScheduleService.save(newSchedule);
 
       return new ResponseEntity<>(
         new Message("WorkSchedules created successfully."),
@@ -241,7 +222,7 @@ public class WorkScheduleController {
         date = date.plusDays(1)
       ) {
         if (dayOfWeek == null || date.getDayOfWeek() == dayOfWeek) {
-          // Check for any schedule conflict
+          // Buscar y eliminar horarios en conflicto
           List<WorkSchedule> schedules =
             workScheduleService.findByUltrasoundDoctorIdAndDate(
               uuidDoctor,
@@ -258,10 +239,7 @@ public class WorkScheduleController {
               schedule.getStart().equals(startTime) ||
               schedule.getEnd().equals(endTime)
             ) {
-              return new ResponseEntity<>(
-                new Message("Schedule conflict detected on " + date.toString()),
-                HttpStatus.CONFLICT
-              );
+              workScheduleService.delete(schedule);
             }
           }
 
@@ -289,7 +267,7 @@ public class WorkScheduleController {
         date = date.plusDays(1)
       ) {
         if (dayOfWeek == null || date.getDayOfWeek() == dayOfWeek) {
-          // Check for any schedule conflict
+          // Buscar y eliminar horarios en conflicto
           List<WorkSchedule> schedules =
             workScheduleService.findByDoctorIdAndDate(uuidDoctor, date);
           for (WorkSchedule schedule : schedules) {
@@ -303,10 +281,7 @@ public class WorkScheduleController {
               schedule.getStart().equals(startTime) ||
               schedule.getEnd().equals(endTime)
             ) {
-              return new ResponseEntity<>(
-                new Message("Schedule conflict detected on " + date.toString()),
-                HttpStatus.CONFLICT
-              );
+              workScheduleService.delete(schedule);
             }
           }
 

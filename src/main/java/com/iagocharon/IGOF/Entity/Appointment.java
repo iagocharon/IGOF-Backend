@@ -57,6 +57,10 @@ public class Appointment {
   @JsonIgnoreProperties("appointments")
   private Insurance insurance;
 
+  private ZonedDateTime arrival;
+
+  private boolean reminded = false;
+
   public Appointment() {
     this.status = AppointmentStatus.INCOMPLETE;
   }
@@ -187,5 +191,21 @@ public class Appointment {
 
   public String getInsuranceName() {
     return insurance.getName();
+  }
+
+  public ZonedDateTime getArrival() {
+    return this.arrival;
+  }
+
+  public void setArrival(ZonedDateTime arrival) {
+    this.arrival = arrival;
+  }
+
+  public boolean isReminded() {
+    return reminded;
+  }
+
+  public void setReminded(boolean reminded) {
+    this.reminded = reminded;
   }
 }

@@ -117,6 +117,16 @@ public class UltrasoundAppointmentController {
         startDate,
         endDate
       );
+    Patient patient = patientService.getById(UUID.fromString(id)).get();
+    for (Patient child : patient.getChildrenPatients()) {
+      List<UltrasoundAppointmentProjection> childAppointments =
+        ultrasoundAppointmentService.findAllByPatientAndDateRange(
+          child.getId(),
+          startDate,
+          endDate
+        );
+      appointments.addAll(childAppointments);
+    }
 
     return new ResponseEntity<>(appointments, HttpStatus.OK);
   }
@@ -287,6 +297,26 @@ public class UltrasoundAppointmentController {
 
     return new ResponseEntity<>(
       new Message("Appointment updated successfully."),
+      HttpStatus.OK
+    );
+  }
+
+  @PutMapping(value = "arrival")
+  public ResponseEntity<?> arrival(@RequestParam String id) {
+    if (!ultrasoundAppointmentService.existsById(UUID.fromString(id))) {
+      return new ResponseEntity<>(
+        new Message("No appointment found."),
+        HttpStatus.NOT_FOUND
+      );
+    }
+    UltrasoundAppointment ultrasoundAppointment = ultrasoundAppointmentService
+      .getById(UUID.fromString(id))
+      .get();
+    ultrasoundAppointment.setArrival(ZonedDateTime.now());
+    ultrasoundAppointmentService.save(ultrasoundAppointment);
+
+    return new ResponseEntity<>(
+      new Message("Arrival time set successfully."),
       HttpStatus.OK
     );
   }

@@ -27,4 +27,6 @@ public interface AppointmentProjection {
   public String getSurgeryPaymentMethodName();
 
   public String getInsuranceName();
+
+  public ZonedDateTime getArrival();
 }

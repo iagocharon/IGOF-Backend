@@ -14,13 +14,16 @@ import com.iagocharon.IGOF.Entity.User;
 import com.iagocharon.IGOF.Entity.WorkSchedule;
 import com.iagocharon.IGOF.Repository.PaymentMethodRepository;
 import com.iagocharon.IGOF.Repository.UserRepository;
+import com.iagocharon.IGOF.Service.AppointmentService;
 import com.iagocharon.IGOF.Service.AuthService;
 import com.iagocharon.IGOF.Service.DoctorService;
+import com.iagocharon.IGOF.Service.EmailService;
 import com.iagocharon.IGOF.Service.InsuranceParentService;
 import com.iagocharon.IGOF.Service.InsuranceService;
 import com.iagocharon.IGOF.Service.MedicalRecordService;
 import com.iagocharon.IGOF.Service.PatientService;
 import com.iagocharon.IGOF.Service.SpecialtyService;
+import com.iagocharon.IGOF.Service.UltrasoundAppointmentService;
 import com.iagocharon.IGOF.Service.UltrasoundDoctorService;
 import com.iagocharon.IGOF.Service.UltrasoundStudyService;
 import com.iagocharon.IGOF.Service.WorkScheduleService;
@@ -81,6 +84,15 @@ public class Utils implements CommandLineRunner {
   @Autowired
   InsuranceParentService insuranceParentService;
 
+  @Autowired
+  AppointmentService appointmentService;
+
+  @Autowired
+  UltrasoundAppointmentService ultrasoundAppointmentService;
+
+  @Autowired
+  EmailService emailService;
+
   @Override
   public void run(String... args) {
     // createInsurancesAndPatients();
@@ -97,12 +109,29 @@ public class Utils implements CommandLineRunner {
 
     // createConsalud();
 
+    schedulePendingReminders();
+
     Optional<User> admin = userRepository.findByUsername("admin");
     User user = admin.orElse(null);
     if (user != null) {
       user.setPassword(passwordEncoder.encode("admin"));
       userRepository.save(user);
     }
+  }
+
+  private void schedulePendingReminders() {
+    // Agendar recordatorios pendientes para appointments
+    appointmentService
+      .getAll()
+      .stream()
+      .filter(a -> !a.isReminded())
+      .forEach(emailService::scheduleReminder);
+    // Agendar recordatorios pendientes para ultrasound appointments
+    ultrasoundAppointmentService
+      .getAll()
+      .stream()
+      .filter(a -> !a.isReminded())
+      .forEach(emailService::scheduleUltrasoundReminder);
   }
 
   public void deleteAllInsurances() {

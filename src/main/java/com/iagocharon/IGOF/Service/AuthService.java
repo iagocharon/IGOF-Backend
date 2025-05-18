@@ -255,6 +255,10 @@ public class AuthService {
     User user = userService
       .getByUsername(loginRequest.getUsername().toLowerCase())
       .get();
+    if (user.getRole() == null) {
+      user.setRole(Role.PATIENT);
+      user = userService.save(user);
+    }
 
     System.out.println("User found: " + user.getUsername());
     if (

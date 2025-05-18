@@ -27,4 +27,6 @@ public interface UltrasoundAppointmentProjection {
   public String getPatientLastname();
 
   public String getInsuranceName();
+
+  public ZonedDateTime getArrival();
 }

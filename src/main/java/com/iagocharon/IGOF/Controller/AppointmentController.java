@@ -109,6 +109,16 @@ public class AppointmentController {
         startDate,
         endDate
       );
+    Patient patient = patientService.getById(UUID.fromString(id)).get();
+    for (Patient child : patient.getChildrenPatients()) {
+      List<AppointmentProjection> childAppointments =
+        appointmentService.findAllByPatientAndDateRange(
+          child.getId(),
+          startDate,
+          endDate
+        );
+      appointments.addAll(childAppointments);
+    }
     return new ResponseEntity<>(appointments, HttpStatus.OK);
   }
 
@@ -290,6 +300,26 @@ public class AppointmentController {
 
     return new ResponseEntity<>(
       new Message("Appointment updated successfully."),
+      HttpStatus.OK
+    );
+  }
+
+  @PutMapping(value = "arrival")
+  public ResponseEntity<?> setArrival(@RequestParam String id) {
+    if (!appointmentService.existsById(UUID.fromString(id))) {
+      return new ResponseEntity<>(
+        new Message("No appointment found."),
+        HttpStatus.NOT_FOUND
+      );
+    }
+    Appointment appointment = appointmentService
+      .getById(UUID.fromString(id))
+      .get();
+    appointment.setArrival(ZonedDateTime.now());
+    appointmentService.save(appointment);
+
+    return new ResponseEntity<>(
+      new Message("Arrival time set successfully."),
       HttpStatus.OK
     );
   }

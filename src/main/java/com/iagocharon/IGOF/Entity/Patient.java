@@ -3,6 +3,7 @@ package com.iagocharon.IGOF.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -43,6 +44,31 @@ public class Patient extends User {
 
   private String insurance;
   private String insuranceNumber;
+
+  @ManyToOne
+  @JoinColumn(name = "parent_patient_id")
+  @JsonIgnoreProperties(
+    {
+      "childrenPatients",
+      "parentPatient",
+      "appointments",
+      "ultrasoundAppointments",
+      "medicalRecord",
+    }
+  )
+  private Patient parentPatient;
+
+  @OneToMany(mappedBy = "parentPatient")
+  @JsonIgnoreProperties(
+    {
+      "childrenPatients",
+      "parentPatient",
+      "appointments",
+      "ultrasoundAppointments",
+      "medicalRecord",
+    }
+  )
+  private List<Patient> childrenPatients = new ArrayList<>();
 
   public Patient() {
     appointments = new ArrayList<>();
@@ -164,5 +190,29 @@ public class Patient extends User {
 
   public void setInsuranceNumber(String insuranceNumber) {
     this.insuranceNumber = insuranceNumber;
+  }
+
+  public Patient getParentPatient() {
+    return this.parentPatient;
+  }
+
+  public void setParentPatient(Patient parentPatient) {
+    this.parentPatient = parentPatient;
+  }
+
+  public List<Patient> getChildrenPatients() {
+    return this.childrenPatients;
+  }
+
+  public void setChildrenPatients(List<Patient> childrenPatients) {
+    this.childrenPatients = childrenPatients;
+  }
+
+  public void addChildrenPatient(Patient childrenPatient) {
+    this.childrenPatients.add(childrenPatient);
+  }
+
+  public void removeChildrenPatient(Patient childrenPatient) {
+    this.childrenPatients.remove(childrenPatient);
   }
 }

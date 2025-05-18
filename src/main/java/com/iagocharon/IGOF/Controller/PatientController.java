@@ -90,6 +90,16 @@ public class PatientController {
     return new ResponseEntity<>(patient, HttpStatus.OK);
   }
 
+  @GetMapping(value = "children")
+  public ResponseEntity<?> getChildren(Authentication authentication) {
+    Patient parent = patientService
+      .getByUsername(authentication.getName())
+      .get();
+    List<Patient> children = parent.getChildrenPatients();
+    children.add(parent);
+    return new ResponseEntity<>(children, HttpStatus.OK);
+  }
+
   @GetMapping(value = "medical-record")
   public ResponseEntity<?> medicalRecord(@RequestParam String id) {
     if (!patientService.existsById(UUID.fromString(id))) {
@@ -131,9 +141,40 @@ public class PatientController {
     patient.setCountry(patientDto.getCountry());
     patient.setCitizenship(patientDto.getCitizenship());
     patient.setInsurance(patientDto.getInsurance());
+    patient.setInsuranceNumber(patientDto.getInsuranceNumber());
     patient.setRole(Role.PATIENT);
 
     patientService.save(patient);
+
+    return new ResponseEntity<>(new Message("User created."), HttpStatus.OK);
+  }
+
+  @PostMapping(value = "create-child")
+  public ResponseEntity<?> createChild(
+    @RequestBody PatientDto patientDto,
+    Authentication authentication
+  ) {
+    Patient parent = patientService
+      .getByUsername(authentication.getName())
+      .get();
+
+    Patient patient = new Patient();
+    patient.setName(patientDto.getName());
+    patient.setLastname(patientDto.getLastname());
+    patient.setBirthdate(patientDto.getBirthdate());
+    patient.setPhone(patientDto.getPhone());
+    patient.setAddress(patientDto.getAddress());
+    patient.setCity(patientDto.getCity());
+    patient.setState(patientDto.getState());
+    patient.setCountry(patientDto.getCountry());
+    patient.setCitizenship(patientDto.getCitizenship());
+    patient.setInsurance(patientDto.getInsurance());
+    patient.setInsuranceNumber(patientDto.getInsuranceNumber());
+    patient.setRole(Role.PATIENT);
+    patient.setParentPatient(parent);
+    patient = patientService.save(patient);
+    parent.addChildrenPatient(patient);
+    patientService.save(parent);
 
     return new ResponseEntity<>(new Message("User created."), HttpStatus.OK);
   }
@@ -155,12 +196,16 @@ public class PatientController {
     patient.setCity(patientDto.getCity());
     patient.setCitizenship(patientDto.getCitizenship());
     patient.setCountry(patientDto.getCountry());
-    patient.setEmail(patientDto.getEmail());
+    if (patientDto.getEmail() != null) {
+      patient.setEmail(patientDto.getEmail());
+    }
+    if (patientDto.getUsername() != null) {
+      patient.setUsername(patientDto.getUsername());
+    }
     patient.setLastname(patientDto.getLastname());
     patient.setName(patientDto.getName());
     patient.setPhone(patientDto.getPhone());
     patient.setState(patientDto.getState());
-    patient.setUsername(patientDto.getUsername());
     patient.setInsurance(patientDto.getInsurance());
     patient.setInsuranceNumber(patientDto.getInsuranceNumber());
     patientService.save(patient);
