@@ -4,9 +4,13 @@ import com.iagocharon.IGOF.Dto.Projections.UltrasoundDoctorProjection;
 import com.iagocharon.IGOF.Entity.Insurance;
 import com.iagocharon.IGOF.Entity.UltrasoundAppointment;
 import com.iagocharon.IGOF.Entity.UltrasoundDoctor;
+import com.iagocharon.IGOF.Entity.UltrasoundStudy;
+import com.iagocharon.IGOF.Entity.WorkSchedule;
 import com.iagocharon.IGOF.Repository.InsuranceRepository;
 import com.iagocharon.IGOF.Repository.UltrasoundAppointmentRepository;
 import com.iagocharon.IGOF.Repository.UltrasoundDoctorRepository;
+import com.iagocharon.IGOF.Repository.UltrasoundStudyRepository;
+import com.iagocharon.IGOF.Repository.WorkScheduleRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +30,12 @@ public class UltrasoundDoctorService {
 
   @Autowired
   UltrasoundAppointmentRepository ultrasoundAppointmentRepository;
+
+  @Autowired
+  WorkScheduleRepository workScheduleRepository;
+
+  @Autowired
+  UltrasoundStudyRepository ultrasoundStudyRepository;
 
   public Optional<UltrasoundDoctor> getByUsername(String username) {
     return ultrasoundDoctorRepository.findByUsername(username);
@@ -87,6 +97,19 @@ public class UltrasoundDoctorService {
       ultrasoundAppointmentRepository.save(appointment);
     }
 
+    List<UltrasoundStudy> ultrasoundStudies = doctor.getUltrasoundStudies();
+    for (UltrasoundStudy ultrasoundStudy : ultrasoundStudies) {
+      ultrasoundStudy.removeUltrasoundDoctor(doctor);
+      ultrasoundStudyRepository.save(ultrasoundStudy);
+    }
+
+    List<WorkSchedule> workSchedules = doctor.getWorkSchedules();
+    for (WorkSchedule workSchedule : workSchedules) {
+      workSchedule.setUltrasoundDoctor(null);
+      workScheduleRepository.save(workSchedule);
+      workScheduleRepository.delete(workSchedule);
+    }
+
     ultrasoundDoctorRepository.delete(doctor);
   }
 
@@ -104,6 +127,19 @@ public class UltrasoundDoctorService {
     for (UltrasoundAppointment appointment : appointments) {
       appointment.setUltrasoundDoctor(null);
       ultrasoundAppointmentRepository.save(appointment);
+    }
+
+    List<UltrasoundStudy> ultrasoundStudies = doctor.getUltrasoundStudies();
+    for (UltrasoundStudy ultrasoundStudy : ultrasoundStudies) {
+      ultrasoundStudy.removeUltrasoundDoctor(doctor);
+      ultrasoundStudyRepository.save(ultrasoundStudy);
+    }
+
+    List<WorkSchedule> workSchedules = doctor.getWorkSchedules();
+    for (WorkSchedule workSchedule : workSchedules) {
+      workSchedule.setUltrasoundDoctor(null);
+      workScheduleRepository.save(workSchedule);
+      workScheduleRepository.delete(workSchedule);
     }
 
     ultrasoundDoctorRepository.deleteById(id);
