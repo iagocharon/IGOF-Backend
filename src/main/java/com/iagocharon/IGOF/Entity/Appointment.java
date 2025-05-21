@@ -94,7 +94,7 @@ public class Appointment {
   }
 
   public UUID getDoctorId() {
-    return doctor.getId();
+    return doctor != null ? doctor.getId() : null;
   }
 
   public void setDoctor(Doctor doctor) {

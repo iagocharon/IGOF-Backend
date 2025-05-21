@@ -1,5 +1,6 @@
 package com.iagocharon.IGOF.Controller;
 
+import com.iagocharon.IGOF.Dto.DeleteWorkSchedulesDto;
 import com.iagocharon.IGOF.Dto.Message;
 import com.iagocharon.IGOF.Dto.Projections.AppointmentProjection;
 import com.iagocharon.IGOF.Dto.Projections.UltrasoundAppointmentProjection;
@@ -473,6 +474,138 @@ public class WorkScheduleController {
     return new ResponseEntity<>(
       new Message("Work schedule deleted."),
       HttpStatus.OK
+    );
+  }
+
+  @DeleteMapping("/delete-range")
+  public ResponseEntity<?> deleteWorkSchedulesInRange(
+    @RequestBody DeleteWorkSchedulesDto dto
+  ) {
+    UUID doctorId = UUID.fromString(dto.getDoctorId());
+    DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+    LocalDate from = LocalDate.parse(dto.getFrom(), formatter);
+    LocalDate to = LocalDate.parse(dto.getTo(), formatter);
+    int deletedCount = 0;
+    int cancelledCount = 0;
+
+    if (doctorService.existsById(doctorId)) {
+      // Doctor común
+      List<WorkSchedule> schedules = workScheduleService.findDoctorBetweenDates(
+        doctorId,
+        from,
+        to
+      );
+      for (WorkSchedule ws : schedules) {
+        // Cancelar turnos asociados a ese horario
+        ZoneId zone = ZoneId.of("America/Argentina/Buenos_Aires");
+        ZonedDateTime start = ZonedDateTime.of(
+          ws.getDate(),
+          ws.getStart(),
+          zone
+        );
+        ZonedDateTime end = ZonedDateTime.of(ws.getDate(), ws.getEnd(), zone);
+        List<AppointmentProjection> appointments =
+          appointmentService.findAllByDoctorAndDateRange(doctorId, start, end);
+        for (AppointmentProjection ap : appointments) {
+          Appointment appointment = appointmentService
+            .getById(ap.getId())
+            .orElse(null);
+          if (
+            appointment != null &&
+            appointment.getStatus() != AppointmentStatus.CANCELLED
+          ) {
+            appointment.setStatus(AppointmentStatus.CANCELLED);
+            appointmentService.save(appointment);
+            cancelledCount++;
+            emailService.cancelReminder(appointment.getId());
+            emailService.sendNewMail(
+              appointment.getPatient().getEmail(),
+              "Turno cancelado",
+              "Hola " +
+              appointment.getPatient().getName() +
+              ", te informamos que tu turno con el Dr. " +
+              appointment.getDoctor().getLastname() +
+              ", " +
+              appointment.getDoctor().getName() +
+              " para el " +
+              appointment.getStart().toLocalDate() +
+              " a las " +
+              appointment.getStart().toLocalTime() +
+              " ha sido cancelado."
+            );
+          }
+        }
+        workScheduleService.deleteById(ws.getId());
+        deletedCount++;
+      }
+    } else if (ultrasoundDoctorService.existsById(doctorId)) {
+      // UltrasoundDoctor
+      List<WorkSchedule> schedules =
+        workScheduleService.findUltrasoundDoctorBetweenDates(
+          doctorId,
+          from,
+          to
+        );
+      for (WorkSchedule ws : schedules) {
+        ZoneId zone = ZoneId.of("America/Argentina/Buenos_Aires");
+        ZonedDateTime start = ZonedDateTime.of(
+          ws.getDate(),
+          ws.getStart(),
+          zone
+        );
+        ZonedDateTime end = ZonedDateTime.of(ws.getDate(), ws.getEnd(), zone);
+        List<UltrasoundAppointmentProjection> appointments =
+          ultrasoundAppointmentService.findAllByDoctorAndDateRange(
+            doctorId,
+            start,
+            end
+          );
+        for (UltrasoundAppointmentProjection ap : appointments) {
+          UltrasoundAppointment appointment = ultrasoundAppointmentService
+            .getById(ap.getId())
+            .orElse(null);
+          if (
+            appointment != null &&
+            appointment.getStatus() != AppointmentStatus.CANCELLED
+          ) {
+            appointment.setStatus(AppointmentStatus.CANCELLED);
+            ultrasoundAppointmentService.save(appointment);
+            cancelledCount++;
+            emailService.cancelReminder(appointment.getId());
+            emailService.sendNewMail(
+              appointment.getPatient().getEmail(),
+              "Turno cancelado",
+              "Hola " +
+              appointment.getPatient().getName() +
+              ", te informamos que tu turno con el Dr. " +
+              appointment.getUltrasoundDoctor().getLastname() +
+              ", " +
+              appointment.getUltrasoundDoctor().getName() +
+              " para el " +
+              appointment.getStart().toLocalDate() +
+              " a las " +
+              appointment.getStart().toLocalTime() +
+              " ha sido cancelado."
+            );
+          }
+        }
+        workScheduleService.deleteById(ws.getId());
+        deletedCount++;
+      }
+    } else {
+      return new ResponseEntity<>(
+        new Message("Doctor not found."),
+        HttpStatus.NOT_FOUND
+      );
+    }
+    return ResponseEntity.ok(
+      new Message(
+        "Se eliminaron " +
+        deletedCount +
+        " horarios y se cancelaron " +
+        cancelledCount +
+        " turnos."
+      )
     );
   }
 }

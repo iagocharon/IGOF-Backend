@@ -55,6 +55,7 @@ public class DoctorController {
       );
     }
     Doctor doctor = doctorService.getById(UUID.fromString(id)).get();
+    System.out.println(doctor);
     return new ResponseEntity<>(doctor, HttpStatus.OK);
   }
 
